@@ -49,8 +49,8 @@ data = {
 
 df = pd.DataFrame(data)
 print(f"\\n📈 Generated dataset with {len(df)} records")
-print(f"📊 Sales mean: ${{'{'}}df['sales'].mean():.2f{{'}'}}")
-print(f"📊 Revenue total: ${{'{'}}df['revenue'].sum():.2f{{'}'}}")
+print(f"📊 Sales mean: \\\${df['sales'].mean():.2f}")
+print(f"📊 Revenue total: \\\${df['revenue'].sum():.2f}")
 
 # Data analysis
 correlation = df[['sales', 'customers', 'revenue']].corr()
