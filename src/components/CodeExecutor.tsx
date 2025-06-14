@@ -21,7 +21,7 @@ interface PackageInfo {
 }
 
 const CodeExecutor: React.FC<CodeExecutorProps> = ({ onExplain }) => {
-  const [code, setCode] = useState(`# Welcome to the Advanced Python Code Executor!
+ const [code, setCode] = useState(`# Welcome to the Advanced Python Code Executor!
 # Full Python environment with CUDA support and virtual environment
 
 import numpy as np
@@ -49,8 +49,8 @@ data = {
 
 df = pd.DataFrame(data)
 print(f"\\n📈 Generated dataset with {len(df)} records")
-const [code, setCode] = useState(`print(f"📊 Sales mean: ${{"{"}df['sales'].mean():.2f{"}"}}")`)
-print(f"📊 Revenue total: ${{'{'}df['revenue'].sum():.2f{'}'}}")
+print(f"📊 Sales mean: ${{'{'}}df['sales'].mean():.2f{{'}'}}")
+print(f"📊 Revenue total: ${{'{'}}df['revenue'].sum():.2f{{'}'}}")
 
 # Data analysis
 correlation = df[['sales', 'customers', 'revenue']].corr()
