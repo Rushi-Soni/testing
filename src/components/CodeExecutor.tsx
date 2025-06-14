@@ -5,7 +5,7 @@ interface CodeExecutorProps {
   onExplain?: (text: string) => void;
 }
 
-interface FileItem {
+interface FileIte {
   name: string;
   content: string;
   type: 'python' | 'text' | 'json' | 'csv';
