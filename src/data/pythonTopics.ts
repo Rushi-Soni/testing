@@ -877,8 +877,8 @@ if __name__ == "__main__":
     
     # Show polymorphism - different interest calculations
     print(f"\\n=== Interest Calculations (Polymorphism) ===")
-    print(f"John's annual interest: ${john_account.calculate_interest():.2f}")
-    print(f"Jane's annual interest: ${jane_account.calculate_interest():.2f}")
+    print(f"John's annual interest: \${john_account.calculate_interest():.2f}")
+    print(f"Jane's annual interest: \${jane_account.calculate_interest():.2f}")
     
     # Bank report
     print(f"\\n=== Bank Report ===")
