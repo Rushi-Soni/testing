@@ -868,7 +868,7 @@ if __name__ == "__main__":
     # John's transactions
     john_account.deposit(500, "Salary deposit")
     john_account.withdraw(200, "ATM withdrawal")
-    print(f"John's balance after transactions: ${john_account.balance:.2f}")
+    print(f"John's balance after transactions: \${john_account.balance:.2f}")
     
     # Jane's transactions
     jane_account.deposit(1000, "Investment return")
