@@ -1016,9 +1016,9 @@ def analyze_sales_performance(df):
     print("\\n1. BASIC STATISTICS")
     print(f"Total Records: {len(df):,}")
     print(f"Date Range: {df['date'].min().strftime('%Y-%m-%d')} to {df['date'].max().strftime('%Y-%m-%d')}")
-    print(f"Total Sales Revenue: ${df['total_sales'].sum():,.2f}")
-    print(f"Average Order Value: ${df['total_sales'].mean():.2f}")
-    print(f"Median Order Value: ${df['total_sales'].median():.2f}")
+    print(f"Total Sales Revenue: \${df['total_sales'].sum():,.2f}")
+    print(f"Average Order Value: \${df['total_sales'].mean():.2f}")
+    print(f"Median Order Value: \${df['total_sales'].median():.2f}")
     
     # Sales by category
     print("\\n2. SALES BY CATEGORY")
