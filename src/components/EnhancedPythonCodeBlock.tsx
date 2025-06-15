@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, RotateCcw, Eye, CheckCircle, Brain, Zap, Database, Clock, Volume2, BookOpen } from 'lucide-react';
+import { Play, RotateCcw, Eye, CheckCircle, Brain, Zap, Database, Clock, BookOpen } from 'lucide-react';
 
 interface EnhancedPythonCodeBlockProps {
   title: string;
@@ -14,7 +14,6 @@ interface EnhancedPythonCodeBlockProps {
   onExecute: () => void;
   isExecuting: boolean;
   output: string;
-  onExplain?: (text: string) => void;
 }
 
 const EnhancedPythonCodeBlock: React.FC<EnhancedPythonCodeBlockProps> = ({
@@ -29,8 +28,7 @@ const EnhancedPythonCodeBlock: React.FC<EnhancedPythonCodeBlockProps> = ({
   performanceNotes,
   onExecute,
   isExecuting,
-  output,
-  onExplain
+  output
 }) => {
   const [activeTab, setActiveTab] = useState<'code' | 'theory' | 'deep' | 'memory' | 'performance'>('code');
   const [highlightedLine, setHighlightedLine] = useState<number | null>(null);
@@ -38,45 +36,10 @@ const EnhancedPythonCodeBlock: React.FC<EnhancedPythonCodeBlockProps> = ({
 
   const handleLineClick = (lineIndex: number, line: string) => {
     setHighlightedLine(lineIndex);
-    
-    if (onExplain) {
-      const explanationText = `Let me explain line ${lineIndex + 1}: "${line.trim()}". ${
-        explanation[lineIndex] || 'This line performs a specific operation in our Python program.'
-      }`;
-      onExplain(explanationText);
-    }
-  };
-
-  const handleConceptClick = (concept: string) => {
-    if (onExplain) {
-      const conceptExplanation = `The concept "${concept}" is fundamental in Python programming. This represents a core programming principle that you'll use throughout your Python journey. Understanding this concept deeply will help you write better, more efficient code.`;
-      onExplain(conceptExplanation);
-    }
   };
 
   const handleTabChange = (tab: typeof activeTab) => {
     setActiveTab(tab);
-    
-    if (onExplain) {
-      let tabExplanation = '';
-      switch (tab) {
-        case 'theory':
-          tabExplanation = 'Now we\'re exploring the theoretical foundation. This section explains the computer science principles behind the code. Understanding theory helps you become a better programmer!';
-          break;
-        case 'deep':
-          tabExplanation = 'Welcome to the deep dive analysis! Here we explore advanced concepts and implementation details that professional developers need to know.';
-          break;
-        case 'memory':
-          tabExplanation = 'This is the memory management section. Understanding how Python handles memory is crucial for writing efficient programs, especially when working with large datasets.';
-          break;
-        case 'performance':
-          tabExplanation = 'Performance analysis helps you understand how fast your code runs and how to optimize it. This is essential knowledge for professional Python development.';
-          break;
-        default:
-          tabExplanation = 'Back to the code analysis section. Here you can see the Python source code with detailed line-by-line explanations.';
-      }
-      onExplain(tabExplanation);
-    }
   };
 
   return (
@@ -89,15 +52,6 @@ const EnhancedPythonCodeBlock: React.FC<EnhancedPythonCodeBlockProps> = ({
               <BookOpen className="h-5 w-5 text-white" />
             </div>
             <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-            {onExplain && (
-              <button
-                onClick={() => onExplain(`Let me introduce this topic: ${title}. This example demonstrates important Python concepts with detailed explanations and interactive features.`)}
-                className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                title="Explain this topic"
-              >
-                <Volume2 className="h-4 w-4" />
-              </button>
-            )}
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -201,7 +155,7 @@ const EnhancedPythonCodeBlock: React.FC<EnhancedPythonCodeBlockProps> = ({
                         highlightedLine === index ? 'bg-blue-900/50 border-l-4 border-blue-400' : ''
                       }`}
                       onClick={() => handleLineClick(index, line)}
-                      title="Click to explain this line"
+                      title="Click to highlight this line"
                     >
                       <span className="text-gray-500 text-sm font-mono w-10 text-right mr-4 select-none">
                         {index + 1}
@@ -216,17 +170,15 @@ const EnhancedPythonCodeBlock: React.FC<EnhancedPythonCodeBlockProps> = ({
 
               {/* Interactive Concepts */}
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-gray-700">Python Concepts (Click to learn):</h4>
+                <h4 className="text-sm font-semibold text-gray-700">Python Concepts:</h4>
                 <div className="flex flex-wrap gap-2">
                   {concepts.map((concept, index) => (
-                    <button
+                    <span
                       key={index}
-                      onClick={() => handleConceptClick(concept)}
-                      className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs rounded-full font-medium transition-colors cursor-pointer"
-                      title={`Click to learn about ${concept}`}
+                      className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs rounded-full font-medium transition-colors"
                     >
                       {concept}
-                    </button>
+                    </span>
                   ))}
                 </div>
               </div>
@@ -236,7 +188,7 @@ const EnhancedPythonCodeBlock: React.FC<EnhancedPythonCodeBlockProps> = ({
             <div className="space-y-6">
               {/* Line-by-Line Explanation */}
               <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-gray-700">Professor's Line-by-Line Analysis:</h4>
+                <h4 className="text-sm font-semibold text-gray-700">Line-by-Line Analysis:</h4>
                 <div className="bg-blue-50 rounded-lg p-4 space-y-3 max-h-64 overflow-y-auto">
                   {explanation.map((line, index) => (
                     <div 

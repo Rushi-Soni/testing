@@ -6,10 +6,9 @@ import { PythonTopic } from '../data/pythonTopics';
 
 interface PythonTopicContentProps {
   topic: PythonTopic;
-  onExplain?: (text: string) => void;
 }
 
-const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic, onExplain }) => {
+const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic }) => {
   const [executingCode, setExecutingCode] = useState<string | null>(null);
   const [outputs, setOutputs] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<'examples' | 'playground'>('examples');
@@ -17,30 +16,17 @@ const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic, onExplai
   const executeCode = async (exampleId: string, code: string) => {
     setExecutingCode(exampleId);
     
-    if (onExplain) {
-      onExplain("I'm executing this Python code for you. Watch as the code runs and produces output. This helps you understand how Python processes each instruction step by step.");
-    }
-    
     // Simulate Python code execution with delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     try {
       // For demonstration, we'll use the expected output from the topic data
-      // In a real implementation, you'd use a Python interpreter or backend service
       const example = topic.examples.find(ex => ex.id === exampleId);
       if (example) {
         setOutputs(prev => ({ ...prev, [exampleId]: example.expectedOutput }));
-        
-        if (onExplain) {
-          onExplain(`Excellent! The code executed successfully. The output shows exactly what we expected. This demonstrates that our Python code is working correctly and following the proper syntax and logic.`);
-        }
       }
     } catch (error) {
       setOutputs(prev => ({ ...prev, [exampleId]: `Execution Error: ${error}` }));
-      
-      if (onExplain) {
-        onExplain(`We encountered an error during execution. Don't worry - errors are a normal part of programming! They help us learn and improve our code. Let me explain what went wrong and how to fix it.`);
-      }
     }
     
     setExecutingCode(null);
@@ -101,13 +87,12 @@ const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic, onExplai
           <div className="bg-white rounded-lg p-6 border border-blue-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
               <Lightbulb className="h-5 w-5 text-yellow-600 mr-2" />
-              TurboTalk AI Professor's Note
+              Learning Objectives
             </h3>
             <p className="text-gray-700 text-sm leading-relaxed">
-              Welcome to this comprehensive Python lesson! I'm TurboTalk AI, your advanced programming professor assistant 
-              created by Rushi Bhavinkumar Soni from Rango Productions. I'm here to guide you through every concept with 
-              voice explanations, interactive features, and real-time code execution. Click on any code line, concept, 
-              or section to get detailed explanations!
+              Master this Python topic through comprehensive examples, interactive code execution, 
+              and real terminal access. Practice with the code playground to reinforce your learning 
+              and experiment with variations of the concepts presented.
             </p>
           </div>
         </div>
@@ -144,7 +129,7 @@ const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic, onExplai
         <div className="space-y-8">
           <h2 className="text-2xl font-bold text-gray-900 flex items-center">
             <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full mr-4"></div>
-            Interactive Python Code Examples with AI Assistance
+            Interactive Python Code Examples
           </h2>
           
           {topic.examples.map((example, index) => (
@@ -167,7 +152,7 @@ const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic, onExplai
                 <p className="text-indigo-800 leading-relaxed">{example.deepDive}</p>
               </div>
               
-              {/* Enhanced Code Block with AI Integration */}
+              {/* Enhanced Code Block */}
               <EnhancedPythonCodeBlock
                 title={`${index + 1}. ${example.title}`}
                 code={example.code}
@@ -181,7 +166,6 @@ const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic, onExplai
                 onExecute={() => executeCode(example.id, example.code)}
                 isExecuting={executingCode === example.id}
                 output={outputs[example.id] || ''}
-                onExplain={onExplain}
               />
             </div>
           ))}
@@ -224,20 +208,20 @@ const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic, onExplai
             </div>
           </div>
           
-          <CodeExecutor onExplain={onExplain} />
+          <CodeExecutor />
         </div>
       )}
 
       {/* Summary Section */}
       <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-8 border border-emerald-200">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">🎯 Python Mastery Summary with TurboTalk AI</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">🎯 Python Mastery Summary</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-lg font-semibold text-emerald-900 mb-3">Key Python Concepts Mastered</h3>
             <ul className="space-y-2 text-emerald-800">
               <li className="flex items-start">
                 <span className="text-emerald-600 mr-2">•</span>
-                Interactive understanding of Python syntax with AI voice explanations
+                Interactive understanding of Python syntax with detailed explanations
               </li>
               <li className="flex items-start">
                 <span className="text-emerald-600 mr-2">•</span>
@@ -254,12 +238,12 @@ const PythonTopicContent: React.FC<PythonTopicContentProps> = ({ topic, onExplai
             </ul>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-emerald-900 mb-3">TurboTalk AI Enhanced Learning</h3>
+            <h3 className="text-lg font-semibold text-emerald-900 mb-3">Enhanced Learning Experience</h3>
             <p className="text-emerald-800 leading-relaxed">
-              With TurboTalk AI as your programming professor assistant, you've experienced personalized learning with 
-              voice explanations, interactive code analysis, real-time execution, and intelligent assistance. This 
-              innovative approach combines traditional computer science education with modern AI technology, web scraping, 
-              and RAG systems to create an immersive learning experience that adapts to your pace and learning style.
+              This comprehensive learning approach combines traditional computer science education with modern 
+              development tools. You've experienced hands-on coding, real terminal access, and practical 
+              implementation that prepares you for professional Python development in data science, machine 
+              learning, and software engineering.
             </p>
           </div>
         </div>
