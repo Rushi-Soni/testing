@@ -689,7 +689,7 @@ class BankAccount(ABC):
     
     def __str__(self) -> str:
         """String representation of the account"""
-        return f"{self.get_account_type().value.title()} Account {self._account_number}: ${self._balance:.2f}"
+        return f"{self.get_account_type().value.title()} Account {self._account_number}: \${self._balance:.2f}"
     
     def __repr__(self) -> str:
         """Developer representation of the account"""
