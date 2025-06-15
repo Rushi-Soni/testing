@@ -733,7 +733,7 @@ class CheckingAccount(BankAccount):
             
             return True
         else:
-            raise ValueError(f"Amount exceeds available funds (${available_funds:.2f})")
+            raise ValueError(f"Amount exceeds available funds (\${available_funds:.2f})")
 
 # Concrete implementation - Savings Account
 class SavingsAccount(BankAccount):
