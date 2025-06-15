@@ -1230,13 +1230,13 @@ if __name__ == "__main__":
     top_category = analysis_results['category_sales'].index[0]
     top_category_sales = analysis_results['category_sales'].iloc[0]['Total_Sales']
     
-    print(f"🏆 Top Category: {top_category} (${top_category_sales:,.2f})")
+    print(f"🏆 Top Category: {top_category} (\${top_category_sales:,.2f})")
     
     # Best region
     top_region = analysis_results['regional_performance'].index[0]
     top_region_sales = analysis_results['regional_performance'].iloc[0]['Total_Sales']
     
-    print(f"🌟 Best Region: {top_region} (${top_region_sales:,.2f})")
+    print(f"🌟 Best Region: {top_region} (\${top_region_sales:,.2f})")
     
     # Data quality score
     total_records = len(cleaned_df)
