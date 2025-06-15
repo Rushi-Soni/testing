@@ -1085,9 +1085,9 @@ def advanced_numpy_operations(df):
     
     print("\\n1. STATISTICAL OPERATIONS")
     print(f"Sales Array Shape: {sales_array.shape}")
-    print(f"Mean Sales: ${np.mean(sales_array):.2f}")
-    print(f"Standard Deviation: ${np.std(sales_array):.2f}")
-    print(f"95th Percentile: ${np.percentile(sales_array, 95):.2f}")
+    print(f"Mean Sales: \${np.mean(sales_array):.2f}")
+    print(f"Standard Deviation: \${np.std(sales_array):.2f}")
+    print(f"95th Percentile: \${np.percentile(sales_array, 95):.2f}")
     print(f"Coefficient of Variation: {(np.std(sales_array) / np.mean(sales_array)) * 100:.2f}%")
     
     # Correlation analysis
