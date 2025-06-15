@@ -320,6 +320,552 @@ Grade Status:
     ]
   },
   {
+    id: 'python-commands',
+    title: 'Python Command Line & System Operations',
+    description: 'Master Python command-line operations, system interactions, file handling, and automation scripts.',
+    difficulty: 'Intermediate',
+    estimatedTime: '3-4 hours',
+    concepts: ['Command Line Arguments', 'System Calls', 'File Operations', 'Environment Variables', 'Process Management', 'Automation Scripts'],
+    examples: [
+      {
+        id: 'python-commands',
+        title: 'Python Command Line and System Operations',
+        code: `# Python Command Line and System Operations
+import sys
+import os
+import subprocess
+import argparse
+import json
+import csv
+import shutil
+import glob
+import time
+from pathlib import Path
+from datetime import datetime
+import platform
+import psutil
+
+class SystemManager:
+    """Comprehensive system management utilities"""
+    
+    def __init__(self):
+        self.start_time = datetime.now()
+        self.commands_executed = []
+    
+    def get_system_info(self):
+        """Get comprehensive system information"""
+        info = {
+            "platform": platform.platform(),
+            "system": platform.system(),
+            "processor": platform.processor(),
+            "architecture": platform.architecture(),
+            "python_version": sys.version,
+            "python_executable": sys.executable,
+            "current_directory": os.getcwd(),
+            "user": os.getenv('USER', os.getenv('USERNAME', 'Unknown')),
+            "home_directory": os.path.expanduser('~'),
+            "environment_variables": dict(os.environ),
+            "cpu_count": os.cpu_count(),
+            "memory_info": {
+                "total": psutil.virtual_memory().total,
+                "available": psutil.virtual_memory().available,
+                "percent": psutil.virtual_memory().percent
+            } if 'psutil' in sys.modules else "psutil not available"
+        }
+        return info
+    
+    def execute_command(self, command, shell=True, capture_output=True):
+        """Execute system command and return result"""
+        try:
+            start_time = time.time()
+            
+            if isinstance(command, str) and shell:
+                result = subprocess.run(
+                    command, 
+                    shell=True, 
+                    capture_output=capture_output,
+                    text=True,
+                    timeout=30
+                )
+            else:
+                result = subprocess.run(
+                    command.split() if isinstance(command, str) else command,
+                    capture_output=capture_output,
+                    text=True,
+                    timeout=30
+                )
+            
+            execution_time = time.time() - start_time
+            
+            command_result = {
+                "command": command,
+                "return_code": result.returncode,
+                "stdout": result.stdout if capture_output else "Output not captured",
+                "stderr": result.stderr if capture_output else "Error not captured",
+                "execution_time": execution_time,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            self.commands_executed.append(command_result)
+            return command_result
+            
+        except subprocess.TimeoutExpired:
+            return {"error": "Command timed out", "command": command}
+        except Exception as e:
+            return {"error": str(e), "command": command}
+    
+    def file_operations(self, operation, source=None, destination=None, pattern=None):
+        """Perform various file operations"""
+        try:
+            if operation == "list":
+                path = source or "."
+                files = []
+                for item in os.listdir(path):
+                    item_path = os.path.join(path, item)
+                    stat_info = os.stat(item_path)
+                    files.append({
+                        "name": item,
+                        "path": item_path,
+                        "is_file": os.path.isfile(item_path),
+                        "is_directory": os.path.isdir(item_path),
+                        "size": stat_info.st_size,
+                        "modified": datetime.fromtimestamp(stat_info.st_mtime).isoformat()
+                    })
+                return {"operation": "list", "path": path, "files": files}
+            
+            elif operation == "create_file":
+                with open(source, 'w') as f:
+                    f.write(destination or "# Created by Python System Manager\\n")
+                return {"operation": "create_file", "file": source, "success": True}
+            
+            elif operation == "read_file":
+                with open(source, 'r') as f:
+                    content = f.read()
+                return {"operation": "read_file", "file": source, "content": content}
+            
+            elif operation == "copy":
+                shutil.copy2(source, destination)
+                return {"operation": "copy", "source": source, "destination": destination, "success": True}
+            
+            elif operation == "move":
+                shutil.move(source, destination)
+                return {"operation": "move", "source": source, "destination": destination, "success": True}
+            
+            elif operation == "delete":
+                if os.path.isfile(source):
+                    os.remove(source)
+                elif os.path.isdir(source):
+                    shutil.rmtree(source)
+                return {"operation": "delete", "path": source, "success": True}
+            
+            elif operation == "find":
+                matches = glob.glob(pattern or source)
+                return {"operation": "find", "pattern": pattern or source, "matches": matches}
+            
+            elif operation == "mkdir":
+                os.makedirs(source, exist_ok=True)
+                return {"operation": "mkdir", "directory": source, "success": True}
+            
+            else:
+                return {"error": f"Unknown operation: {operation}"}
+                
+        except Exception as e:
+            return {"error": str(e), "operation": operation}
+    
+    def process_management(self, action, process_name=None, pid=None):
+        """Manage system processes"""
+        try:
+            if action == "list":
+                processes = []
+                for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
+                    try:
+                        processes.append(proc.info)
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        pass
+                return {"action": "list", "processes": processes[:20]}  # Limit to 20 processes
+            
+            elif action == "info" and pid:
+                proc = psutil.Process(pid)
+                info = {
+                    "pid": proc.pid,
+                    "name": proc.name(),
+                    "status": proc.status(),
+                    "cpu_percent": proc.cpu_percent(),
+                    "memory_percent": proc.memory_percent(),
+                    "create_time": datetime.fromtimestamp(proc.create_time()).isoformat(),
+                    "cmdline": proc.cmdline()
+                }
+                return {"action": "info", "process_info": info}
+            
+            elif action == "find" and process_name:
+                matching_processes = []
+                for proc in psutil.process_iter(['pid', 'name']):
+                    try:
+                        if process_name.lower() in proc.info['name'].lower():
+                            matching_processes.append(proc.info)
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        pass
+                return {"action": "find", "process_name": process_name, "matches": matching_processes}
+            
+            else:
+                return {"error": "Invalid action or missing parameters"}
+                
+        except Exception as e:
+            return {"error": str(e), "action": action}
+    
+    def environment_operations(self, operation, var_name=None, var_value=None):
+        """Manage environment variables"""
+        try:
+            if operation == "get":
+                if var_name:
+                    value = os.getenv(var_name)
+                    return {"operation": "get", "variable": var_name, "value": value}
+                else:
+                    return {"operation": "get_all", "variables": dict(os.environ)}
+            
+            elif operation == "set" and var_name and var_value:
+                os.environ[var_name] = var_value
+                return {"operation": "set", "variable": var_name, "value": var_value, "success": True}
+            
+            elif operation == "unset" and var_name:
+                if var_name in os.environ:
+                    del os.environ[var_name]
+                    return {"operation": "unset", "variable": var_name, "success": True}
+                else:
+                    return {"operation": "unset", "variable": var_name, "error": "Variable not found"}
+            
+            else:
+                return {"error": "Invalid operation or missing parameters"}
+                
+        except Exception as e:
+            return {"error": str(e), "operation": operation}
+
+def create_command_line_parser():
+    """Create comprehensive command line argument parser"""
+    parser = argparse.ArgumentParser(
+        description="Python System Manager - Command Line Operations",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python script.py --system-info
+  python script.py --execute "ls -la"
+  python script.py --file-op list --source /home/user
+  python script.py --file-op create_file --source test.txt --destination "Hello World"
+  python script.py --process list
+  python script.py --env get --var-name PATH
+        """
+    )
+    
+    # System information
+    parser.add_argument('--system-info', action='store_true',
+                       help='Display comprehensive system information')
+    
+    # Command execution
+    parser.add_argument('--execute', type=str,
+                       help='Execute a system command')
+    
+    # File operations
+    parser.add_argument('--file-op', choices=['list', 'create_file', 'read_file', 'copy', 'move', 'delete', 'find', 'mkdir'],
+                       help='File operation to perform')
+    parser.add_argument('--source', type=str,
+                       help='Source file/directory path')
+    parser.add_argument('--destination', type=str,
+                       help='Destination file/directory path')
+    parser.add_argument('--pattern', type=str,
+                       help='Search pattern for find operation')
+    
+    # Process management
+    parser.add_argument('--process', choices=['list', 'info', 'find'],
+                       help='Process management operation')
+    parser.add_argument('--pid', type=int,
+                       help='Process ID for process operations')
+    parser.add_argument('--process-name', type=str,
+                       help='Process name for search operations')
+    
+    # Environment variables
+    parser.add_argument('--env', choices=['get', 'set', 'unset'],
+                       help='Environment variable operation')
+    parser.add_argument('--var-name', type=str,
+                       help='Environment variable name')
+    parser.add_argument('--var-value', type=str,
+                       help='Environment variable value')
+    
+    # Output format
+    parser.add_argument('--output-format', choices=['json', 'table', 'simple'],
+                       default='simple', help='Output format')
+    
+    # Verbose mode
+    parser.add_argument('--verbose', '-v', action='store_true',
+                       help='Enable verbose output')
+    
+    return parser
+
+def format_output(data, format_type='simple', verbose=False):
+    """Format output based on specified format"""
+    if format_type == 'json':
+        return json.dumps(data, indent=2, default=str)
+    
+    elif format_type == 'table' and isinstance(data, dict):
+        output = []
+        for key, value in data.items():
+            if isinstance(value, (dict, list)):
+                output.append(f"{key}: {json.dumps(value, default=str)}")
+            else:
+                output.append(f"{key}: {value}")
+        return "\\n".join(output)
+    
+    else:  # simple format
+        if isinstance(data, dict):
+            if 'error' in data:
+                return f"❌ Error: {data['error']}"
+            elif 'success' in data and data['success']:
+                return f"✅ Operation successful: {data.get('operation', 'Unknown')}"
+            else:
+                # Custom formatting for different operations
+                if 'files' in data:
+                    output = [f"📁 Directory listing for: {data['path']}"]
+                    for file_info in data['files'][:10]:  # Limit to 10 files
+                        icon = "📁" if file_info['is_directory'] else "📄"
+                        size = f"({file_info['size']} bytes)" if file_info['is_file'] else ""
+                        output.append(f"  {icon} {file_info['name']} {size}")
+                    if len(data['files']) > 10:
+                        output.append(f"  ... and {len(data['files']) - 10} more items")
+                    return "\\n".join(output)
+                
+                elif 'processes' in data:
+                    output = ["🔄 Running processes:"]
+                    for proc in data['processes'][:10]:
+                        output.append(f"  PID {proc['pid']}: {proc['name']}")
+                    return "\\n".join(output)
+                
+                elif 'stdout' in data:
+                    if data['return_code'] == 0:
+                        return f"✅ Command executed successfully:\\n{data['stdout']}"
+                    else:
+                        return f"❌ Command failed (code {data['return_code']}):\\n{data['stderr']}"
+                
+                else:
+                    return str(data)
+        else:
+            return str(data)
+
+def main():
+    """Main function for command line interface"""
+    parser = create_command_line_parser()
+    args = parser.parse_args()
+    
+    # Initialize system manager
+    system_manager = SystemManager()
+    
+    # Handle different operations
+    result = None
+    
+    if args.system_info:
+        print("🖥️ Gathering system information...")
+        result = system_manager.get_system_info()
+        
+    elif args.execute:
+        print(f"⚡ Executing command: {args.execute}")
+        result = system_manager.execute_command(args.execute)
+        
+    elif args.file_op:
+        print(f"📁 Performing file operation: {args.file_op}")
+        result = system_manager.file_operations(
+            args.file_op, args.source, args.destination, args.pattern
+        )
+        
+    elif args.process:
+        print(f"🔄 Process operation: {args.process}")
+        result = system_manager.process_management(
+            args.process, args.process_name, args.pid
+        )
+        
+    elif args.env:
+        print(f"🌍 Environment operation: {args.env}")
+        result = system_manager.environment_operations(
+            args.env, args.var_name, args.var_value
+        )
+        
+    else:
+        parser.print_help()
+        return
+    
+    # Format and display output
+    if result:
+        formatted_output = format_output(result, args.output_format, args.verbose)
+        print("\\n" + "="*50)
+        print("RESULT:")
+        print("="*50)
+        print(formatted_output)
+        
+        if args.verbose and 'execution_time' in result:
+            print(f"\\n⏱️ Execution time: {result['execution_time']:.3f} seconds")
+
+# Demonstration of Python command operations
+def demonstrate_python_commands():
+    """Demonstrate various Python command line operations"""
+    print("=== PYTHON COMMAND LINE OPERATIONS DEMONSTRATION ===")
+    
+    system_manager = SystemManager()
+    
+    # System information
+    print("\\n🖥️ System Information:")
+    sys_info = system_manager.get_system_info()
+    print(f"Platform: {sys_info['platform']}")
+    print(f"Python Version: {sys_info['python_version'].split()[0]}")
+    print(f"Current Directory: {sys_info['current_directory']}")
+    print(f"User: {sys_info['user']}")
+    
+    # Command execution examples
+    print("\\n⚡ Command Execution Examples:")
+    
+    commands = [
+        "python --version",
+        "pip list | head -5" if sys.platform != "win32" else "pip list",
+        "echo 'Hello from Python command execution!'",
+        "pwd" if sys.platform != "win32" else "cd"
+    ]
+    
+    for cmd in commands:
+        print(f"\\n📝 Executing: {cmd}")
+        result = system_manager.execute_command(cmd)
+        if result.get('return_code') == 0:
+            print(f"✅ Output: {result['stdout'].strip()}")
+        else:
+            print(f"❌ Error: {result.get('stderr', 'Unknown error')}")
+    
+    # File operations
+    print("\\n📁 File Operations:")
+    
+    # Create a test file
+    file_result = system_manager.file_operations(
+        "create_file", 
+        "test_python_commands.txt", 
+        "This file was created by Python System Manager\\nTimestamp: " + datetime.now().isoformat()
+    )
+    print(f"✅ Created test file: {file_result}")
+    
+    # List current directory
+    list_result = system_manager.file_operations("list", ".")
+    print(f"📂 Current directory contains {len(list_result['files'])} items")
+    
+    # Read the test file
+    read_result = system_manager.file_operations("read_file", "test_python_commands.txt")
+    print(f"📄 File content: {read_result['content'][:50]}...")
+    
+    # Environment variables
+    print("\\n🌍 Environment Variables:")
+    
+    # Get PATH variable
+    path_result = system_manager.environment_operations("get", "PATH")
+    if path_result['value']:
+        paths = path_result['value'].split(os.pathsep)
+        print(f"📍 PATH contains {len(paths)} directories")
+        print(f"First few paths: {paths[:3]}")
+    
+    # Set a custom environment variable
+    set_result = system_manager.environment_operations("set", "PYTHON_DEMO", "Hello World")
+    print(f"✅ Set environment variable: {set_result}")
+    
+    # Get the custom variable
+    get_result = system_manager.environment_operations("get", "PYTHON_DEMO")
+    print(f"📖 Retrieved variable: {get_result}")
+    
+    # Process information (if psutil is available)
+    if 'psutil' in sys.modules:
+        print("\\n🔄 Process Information:")
+        proc_result = system_manager.process_management("list")
+        if 'processes' in proc_result:
+            print(f"📊 Found {len(proc_result['processes'])} running processes")
+            python_procs = [p for p in proc_result['processes'] if 'python' in p['name'].lower()]
+            if python_procs:
+                print(f"🐍 Python processes: {len(python_procs)}")
+    
+    # Cleanup
+    try:
+        os.remove("test_python_commands.txt")
+        print("\\n🧹 Cleaned up test file")
+    except:
+        pass
+    
+    print("\\n✅ Python command line operations demonstration completed!")
+
+if __name__ == "__main__":
+    # Check if script is run with command line arguments
+    if len(sys.argv) > 1:
+        main()
+    else:
+        # Run demonstration
+        demonstrate_python_commands()`,
+        explanation: [
+          "Lines 15-35: SystemManager class provides comprehensive system management utilities with command tracking and execution history.",
+          "Lines 37-55: get_system_info() gathers detailed system information including platform, Python version, memory, and environment details.",
+          "Lines 57-85: execute_command() safely executes system commands with timeout protection and result capture.",
+          "Lines 87-130: file_operations() provides comprehensive file management including create, read, copy, move, delete, and search operations.",
+          "Lines 132-165: process_management() interfaces with system processes for listing, information gathering, and process search functionality.",
+          "Lines 167-190: environment_operations() manages environment variables with get, set, and unset operations.",
+          "Lines 192-230: create_command_line_parser() builds comprehensive argument parser with multiple operation modes and help documentation.",
+          "Lines 232-275: format_output() provides multiple output formats (JSON, table, simple) with intelligent formatting for different data types.",
+          "Lines 277-320: main() function orchestrates command-line interface operations based on parsed arguments.",
+          "Lines 322-380: demonstrate_python_commands() provides comprehensive demonstration of all system management capabilities.",
+          "Lines 382-410: Command execution examples show practical usage of system commands through Python interface.",
+          "Lines 412-430: File operations demonstration shows creation, reading, and manipulation of files through Python."
+        ],
+        expectedOutput: `=== PYTHON COMMAND LINE OPERATIONS DEMONSTRATION ===
+
+🖥️ System Information:
+Platform: Windows-10-10.0.19041-SP0
+Python Version: 3.11.4
+Current Directory: C:\\Users\\Developer\\Projects\\python-course
+User: Developer
+
+⚡ Command Execution Examples:
+
+📝 Executing: python --version
+✅ Output: Python 3.11.4
+
+📝 Executing: pip list
+✅ Output: Package         Version
+---------- -------
+numpy      1.24.3
+pandas     2.0.3
+matplotlib 3.7.2
+requests   2.31.0
+...
+
+📝 Executing: echo 'Hello from Python command execution!'
+✅ Output: Hello from Python command execution!
+
+📝 Executing: cd
+✅ Output: C:\\Users\\Developer\\Projects\\python-course
+
+📁 File Operations:
+✅ Created test file: {'operation': 'create_file', 'file': 'test_python_commands.txt', 'success': True}
+📂 Current directory contains 15 items
+📄 File content: This file was created by Python System Manager...
+
+🌍 Environment Variables:
+📍 PATH contains 23 directories
+First few paths: ['C:\\Python311\\Scripts\\', 'C:\\Python311\\', 'C:\\Windows\\system32']
+✅ Set environment variable: {'operation': 'set', 'variable': 'PYTHON_DEMO', 'value': 'Hello World', 'success': True}
+📖 Retrieved variable: {'operation': 'get', 'variable': 'PYTHON_DEMO', 'value': 'Hello World'}
+
+🔄 Process Information:
+📊 Found 20 running processes
+🐍 Python processes: 3
+
+🧹 Cleaned up test file
+
+✅ Python command line operations demonstration completed!`,
+        concepts: ['Command Line Arguments', 'System Commands', 'File Operations', 'Environment Variables', 'Process Management', 'Subprocess Module', 'Argument Parsing', 'System Information'],
+        theory: 'Python provides extensive capabilities for system interaction through modules like os, sys, subprocess, and argparse. Command-line interfaces enable automation and system administration tasks. The subprocess module safely executes system commands while argparse creates professional command-line interfaces. Environment variables provide configuration and system information access.',
+        deepDive: 'System programming in Python involves understanding process management, file system operations, and inter-process communication. The subprocess module provides secure command execution with proper input/output handling and timeout protection. Environment variables serve as a communication mechanism between processes and provide system configuration. Process management enables monitoring and control of system resources.',
+        memoryAnalysis: 'System operations can consume significant memory when capturing command output or processing large file lists. Subprocess operations create new processes with their own memory space. Environment variables are stored in process memory and inherited by child processes. File operations should use context managers to ensure proper resource cleanup and prevent memory leaks.',
+        performanceNotes: 'System command execution has overhead due to process creation and context switching. Use subprocess instead of os.system for better security and control. Batch file operations when possible to reduce system call overhead. Environment variable access is fast but avoid frequent modifications. Process enumeration can be expensive - cache results when appropriate. Use pathlib for modern, efficient file path operations.'
+      }
+    ]
+  },
+  {
     id: 'functions-modules',
     title: 'Functions & Modules',
     description: 'Master function definition, parameters, return values, scope, lambda functions, and module organization.',
