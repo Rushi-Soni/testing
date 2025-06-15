@@ -888,7 +888,7 @@ if __name__ == "__main__":
     # Transaction history
     print(f"\\n=== Recent Transaction History ===")
     for transaction in john_account.get_transaction_history(limit=3):
-        print(f"  {transaction['timestamp'][:19]}: {transaction['type']} ${abs(transaction['amount']):.2f} - {transaction['description']}")`,
+        print(f"  {transaction['timestamp'][:19]}: {transaction['type']} \${abs(transaction['amount']):.2f} - {transaction['description']}")`,
         explanation: [
           "Lines 8-13: Enum class defines account types with string values, providing type safety and clear constants.",
           "Lines 15-18: Protocol defines interface for transaction validation, enabling duck typing and dependency injection.",
