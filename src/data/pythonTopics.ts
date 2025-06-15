@@ -873,7 +873,7 @@ if __name__ == "__main__":
     # Jane's transactions
     jane_account.deposit(1000, "Investment return")
     jane_account.withdraw(300, "Monthly expenses")
-    print(f"Jane's balance after transactions: ${jane_account.balance:.2f}")
+    print(f"Jane's balance after transactions: \${jane_account.balance:.2f}")
     
     # Show polymorphism - different interest calculations
     print(f"\\n=== Interest Calculations (Polymorphism) ===")
