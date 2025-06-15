@@ -1127,9 +1127,9 @@ def advanced_numpy_operations(df):
     low_performers = sales_array[sales_array < np.percentile(sales_array, 20)]
     
     print(f"High performers (top 20%): {len(high_performers)} orders")
-    print(f"Average high performer sale: ${np.mean(high_performers):.2f}")
+    print(f"Average high performer sale: \${np.mean(high_performers):.2f}")
     print(f"Low performers (bottom 20%): {len(low_performers)} orders")
-    print(f"Average low performer sale: ${np.mean(low_performers):.2f}")
+    print(f"Average low performer sale: \${np.mean(low_performers):.2f}")
     
     return {
         'correlation_matrix': correlation_matrix,
