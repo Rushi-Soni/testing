@@ -1117,7 +1117,7 @@ def advanced_numpy_operations(df):
     window_size = 30
     if len(sales_array) >= window_size:
         moving_avg = np.convolve(sales_array, np.ones(window_size)/window_size, mode='valid')
-        print(f"30-day moving average range: ${moving_avg.min():.2f} - ${moving_avg.max():.2f}")
+        print(f"30-day moving average range: \${moving_avg.min():.2f} - \${moving_avg.max():.2f}")
     
     # Performance metrics
     print("\\n4. PERFORMANCE METRICS")
