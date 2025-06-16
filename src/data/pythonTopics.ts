@@ -2263,11 +2263,11 @@ class SavingsAccount(BankAccount):
         
         # Check minimum balance
         if (self._balance - amount) < self._min_balance:
-            raise ValueError(f"Withdrawal would violate minimum balance of ${self._min_balance:.2f}")
+            raise ValueError(f"Withdrawal would violate minimum balance of ${self._min_balance}.2f}")
         
         self._balance -= amount
         self._monthly_withdrawals += 1
-        self._add_transaction("WITHDRAWAL", -amount, f"Withdrawal of ${amount:.2f}")
+        self._add_transaction("WITHDRAWAL", -amount, f"Withdrawal of ${amount}.2f}")
         return True
     
     def reset_monthly_withdrawals(self):
@@ -2328,13 +2328,13 @@ accounts = [checking, savings]
 
 for account in accounts:
     interest = account.calculate_interest()
-    print(f"   {account.get_account_type().value.title()}: ${interest:.2f} annual interest")
+    print(f"   {account.get_account_type().value.title()}: ${interest}.2f} annual interest")
 
 # Demonstrate encapsulation and properties
 print("\\n3. Encapsulation and property access:")
-print(f"   Checking balance: ${checking.balance:.2f}")
-print(f"   Checking available: ${checking.available_balance:.2f}")
-print(f"   Savings minimum: ${savings.min_balance:.2f}")
+print(f"   Checking balance: ${checking.balance}.2f}")
+print(f"   Checking available: ${checking.available_balance}.2f}")
+print(f"   Savings minimum: ${savings.min_balance}.2f}")
 
 # Demonstrate method calls and state changes
 print("\\n4. Account operations:")
@@ -2342,8 +2342,8 @@ checking.deposit(500)
 checking.withdraw(200)
 savings.deposit(1000)
 
-print(f"   After operations - Checking: ${checking.balance:.2f}")
-print(f"   After operations - Savings: ${savings.balance:.2f}")
+print(f"   After operations - Checking: ${checking.balance}.2f}")
+print(f"   After operations - Savings: ${savings.balance}.2f}")
 
 # Demonstrate class methods and static methods
 print("\\n5. Class and static methods:")
