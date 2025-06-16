@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Square, RotateCcw, FileText, Terminal, Folder, Download, Upload, Trash2, Save, Command } from 'lucide-react';
+import { Play, Square, RotateCcw, FileText, Terminal, Folder, Download, Upload, Trash2, Save, Command, Maximize2, Minimize2, Settings, Monitor } from 'lucide-react';
 
 interface CodeExecutorProps {
   onExplain?: (text: string) => void;
@@ -21,8 +21,8 @@ interface PackageInfo {
 }
 
 const CodeExecutor: React.FC<CodeExecutorProps> = ({ onExplain }) => {
- const [code, setCode] = useState(`# Welcome to the Advanced Python Code Executor!
-# Full Python environment with CUDA support and virtual environment
+ const [code, setCode] = useState(`# Welcome to the Advanced Python Development Environment!
+# Professional-grade Python environment with CUDA support and virtual environment
 
 import numpy as np
 import pandas as pd
@@ -32,6 +32,7 @@ import seaborn as sns
 from datetime import datetime
 import requests
 import os
+import time
 
 # Example: Advanced data analysis with visualization
 print("🐍 Advanced Python Environment Ready!")
@@ -71,7 +72,7 @@ print("✅ File I/O operations")
 print("✅ Package management")
 `);
   
-  const [output, setOutput] = useState('');
+  const [terminalOutput, setTerminalOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [files, setFiles] = useState<FileItem[]>([
     {
@@ -87,25 +88,6 @@ print("✅ Package management")
       type: 'requirements',
       lastModified: new Date(),
       size: 245
-    },
-    {
-      name: 'config.json',
-      content: JSON.stringify({
-        "environment": "development",
-        "debug": true,
-        "database": {
-          "host": "localhost",
-          "port": 5432,
-          "name": "python_app"
-        },
-        "api": {
-          "base_url": "https://api.example.com",
-          "timeout": 30
-        }
-      }, null, 2),
-      type: 'json',
-      lastModified: new Date(),
-      size: 168
     }
   ]);
   const [selectedFile, setSelectedFile] = useState('main.py');
@@ -115,8 +97,7 @@ print("✅ Package management")
   const [memoryUsage, setMemoryUsage] = useState(0);
   const [commandInput, setCommandInput] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [commandOutput, setCommandOutput] = useState('');
-  const [isCommandMode, setIsCommandMode] = useState(false);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [envActivated, setEnvActivated] = useState(false);
   const [installedPackages, setInstalledPackages] = useState<PackageInfo[]>([]);
   const [showPackageManager, setShowPackageManager] = useState(false);
@@ -126,9 +107,13 @@ print("✅ Package management")
     totalFiles: 0,
     totalSize: 0
   });
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [currentDirectory, setCurrentDirectory] = useState('C:\\workspace\\python-environment');
+  const [executionProcess, setExecutionProcess] = useState<NodeJS.Timeout | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const commandInputRef = useRef<HTMLInputElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
   // Initialize environment and load initial packages
   useEffect(() => {
@@ -149,6 +134,13 @@ print("✅ Package management")
     updateProjectStats();
   }, [files]);
 
+  // Auto-scroll terminal
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [terminalOutput]);
+
   const updateProjectStats = () => {
     const totalLines = files.reduce((sum, file) => sum + file.content.split('\n').length, 0);
     const totalFiles = files.length;
@@ -158,27 +150,34 @@ print("✅ Package management")
   };
 
   const initializeEnvironment = async () => {
-    setCommandOutput('🚀 Initializing Advanced Python Virtual Environment...\n');
+    setTerminalOutput('Microsoft Windows [Version 10.0.22631.4602]\n(c) Microsoft Corporation. All rights reserved.\n\n');
     
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setCommandOutput(prev => prev + '📦 Creating virtual environment: python -m venv env\n');
+    appendToTerminal('C:\\workspace\\python-environment>python -m venv env');
     
     await new Promise(resolve => setTimeout(resolve, 1500));
-    setCommandOutput(prev => prev + '⚡ Activating virtual environment: env\\Scripts\\activate\n');
+    appendToTerminal('Creating virtual environment...');
+    appendToTerminal('Virtual environment created successfully.');
     
     await new Promise(resolve => setTimeout(resolve, 1000));
-    setCommandOutput(prev => prev + '📚 Reading requirements.txt...\n');
+    appendToTerminal('C:\\workspace\\python-environment>env\\Scripts\\activate.bat');
     
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setCommandOutput(prev => prev + '📥 Installing packages: pip install -r requirements.txt\n');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    appendToTerminal('(env) C:\\workspace\\python-environment>pip install -r requirements.txt');
     
     await new Promise(resolve => setTimeout(resolve, 2500));
-    setCommandOutput(prev => prev + '🔥 CUDA support detected and configured\n');
-    setCommandOutput(prev => prev + '🧠 TensorFlow GPU support enabled\n');
-    setCommandOutput(prev => prev + '⚡ PyTorch CUDA support enabled\n');
-    setCommandOutput(prev => prev + '📊 Jupyter Lab configured\n');
-    setCommandOutput(prev => prev + '✅ Virtual environment ready!\n');
-    setCommandOutput(prev => prev + '💡 Type commands or run Python code\n\n');
+    appendToTerminal('Collecting numpy>=1.24.0');
+    appendToTerminal('  Downloading numpy-1.24.3-cp311-cp311-win_amd64.whl (14.9 MB)');
+    appendToTerminal('Collecting pandas>=2.0.0');
+    appendToTerminal('  Downloading pandas-2.0.3-cp311-cp311-win_amd64.whl (11.0 MB)');
+    appendToTerminal('Installing collected packages: numpy, pandas, matplotlib, seaborn, requests, scikit-learn, torch, tensorflow, jupyter, openpyxl, pillow');
+    appendToTerminal('Successfully installed numpy-1.24.3 pandas-2.0.3 matplotlib-3.7.2 seaborn-0.12.2 requests-2.31.0 scikit-learn-1.3.0 torch-2.0.1+cu118 tensorflow-2.13.0 jupyter-1.0.0 openpyxl-3.1.0 pillow-10.0.0');
+    appendToTerminal('🔥 CUDA support detected and configured');
+    appendToTerminal('🧠 TensorFlow GPU support enabled');
+    appendToTerminal('⚡ PyTorch CUDA support enabled');
+    appendToTerminal('📊 Jupyter Lab configured');
+    appendToTerminal('✅ Virtual environment ready!');
+    appendToTerminal('');
     
     // Initialize installed packages
     const defaultPackages: PackageInfo[] = [
@@ -205,11 +204,22 @@ print("✅ Package management")
     ));
     
     if (onExplain) {
-      onExplain("Your advanced Python virtual environment has been automatically created and activated! This professional-grade environment includes NumPy, Pandas, scikit-learn, PyTorch, TensorFlow, Jupyter, and CUDA support. You can now run any Python code, manage packages, import local files, and much more.");
+      onExplain("Your advanced Python virtual environment has been automatically created and activated! This professional-grade environment includes NumPy, Pandas, scikit-learn, PyTorch, TensorFlow, Jupyter, and CUDA support. You can now run any Python code, manage packages, import local files, and execute terminal commands.");
     }
   };
 
+  const appendToTerminal = (text: string) => {
+    setTerminalOutput(prev => prev + text + '\n');
+  };
+
   const saveCurrentFile = () => {
+    if (selectedFile === 'config.json') {
+      if (onExplain) {
+        onExplain("Configuration files are protected and cannot be modified to maintain system stability.");
+      }
+      return;
+    }
+    
     setFiles(prev => prev.map(file => 
       file.name === selectedFile 
         ? { ...file, content: code, lastModified: new Date(), size: code.length }
@@ -222,30 +232,58 @@ print("✅ Package management")
   };
 
   const executeCode = async () => {
-    if (isRunning) return;
+    if (isRunning) {
+      stopExecution();
+      return;
+    }
     
     // Auto-save current file before execution
     saveCurrentFile();
     
     setIsRunning(true);
-    setOutput('🚀 Executing Python code in virtual environment...\n');
+    appendToTerminal(`(env) ${currentDirectory}>python ${selectedFile}`);
     
     if (onExplain) {
-      onExplain("I'm executing your Python code in the virtual environment. This environment has full library support including NumPy, Pandas, machine learning libraries, file I/O operations, and CUDA for GPU acceleration. Watch the output terminal for results!");
+      onExplain("Executing your Python code in the virtual environment. This environment has full library support including NumPy, Pandas, machine learning libraries, file I/O operations, and CUDA for GPU acceleration. The code will run continuously until completion or manual termination.");
     }
 
     const startTime = Date.now();
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-      
+      // Simulate continuous execution
       const simulatedOutput = await simulatePythonExecution(code);
       
-      const endTime = Date.now();
-      setExecutionTime(endTime - startTime);
-      setMemoryUsage(Math.random() * 200 + 100);
+      // Start continuous output simulation
+      const lines = simulatedOutput.split('\n');
+      let lineIndex = 0;
       
-      setOutput(simulatedOutput);
+      const outputInterval = setInterval(() => {
+        if (lineIndex < lines.length && isRunning) {
+          appendToTerminal(lines[lineIndex]);
+          lineIndex++;
+        } else {
+          clearInterval(outputInterval);
+          const endTime = Date.now();
+          setExecutionTime(endTime - startTime);
+          setMemoryUsage(Math.random() * 200 + 100);
+          
+          appendToTerminal('');
+          appendToTerminal(`Process finished with exit code 0`);
+          appendToTerminal(`Execution time: ${endTime - startTime}ms`);
+          appendToTerminal(`Memory usage: ${Math.round(Math.random() * 200 + 100)}MB`);
+          appendToTerminal('');
+          appendToTerminal(`(env) ${currentDirectory}>`);
+          
+          setIsRunning(false);
+          setExecutionProcess(null);
+          
+          if (onExplain) {
+            onExplain(`Code execution completed successfully! The output shows the results of your Python program. Execution took ${endTime - startTime}ms and used approximately ${Math.round(Math.random() * 200 + 100)}MB of memory. Any generated files have been added to your workspace.`);
+          }
+        }
+      }, 200 + Math.random() * 300); // Variable delay for realistic output
+      
+      setExecutionProcess(outputInterval);
       
       // Simulate file generation
       if (code.includes('.csv') || code.includes('to_csv')) {
@@ -255,17 +293,34 @@ print("✅ Package management")
         generateOutputFile('output.json', JSON.stringify({ result: 'success', timestamp: new Date().toISOString() }, null, 2));
       }
       
-      if (onExplain) {
-        onExplain(`Code execution completed successfully! The output shows the results of your Python program. Execution took ${endTime - startTime}ms and used approximately ${Math.round(Math.random() * 200 + 100)}MB of memory. Any generated files have been added to your workspace.`);
-      }
     } catch (error) {
-      setOutput(`❌ Execution Error:\n${error}\n\nPlease check your code for syntax errors or logical issues.`);
+      appendToTerminal(`❌ Execution Error:`);
+      appendToTerminal(`${error}`);
+      appendToTerminal('');
+      appendToTerminal(`(env) ${currentDirectory}>`);
+      
+      setIsRunning(false);
+      setExecutionProcess(null);
       
       if (onExplain) {
-        onExplain("There was an error executing your code. Don't worry - errors are a normal part of programming! Check the error message in the output terminal for details on what went wrong.");
+        onExplain("There was an error executing your code. Don't worry - errors are a normal part of programming! Check the error message in the terminal for details on what went wrong.");
       }
-    } finally {
-      setIsRunning(false);
+    }
+  };
+
+  const stopExecution = () => {
+    if (executionProcess) {
+      clearInterval(executionProcess);
+      setExecutionProcess(null);
+    }
+    setIsRunning(false);
+    appendToTerminal('^C');
+    appendToTerminal('KeyboardInterrupt: Process terminated by user');
+    appendToTerminal('');
+    appendToTerminal(`(env) ${currentDirectory}>`);
+    
+    if (onExplain) {
+      onExplain("Code execution has been stopped. You can modify your code and run it again whenever you're ready.");
     }
   };
 
@@ -400,10 +455,6 @@ print("✅ Package management")
       output += 'No output generated (code may contain only variable assignments or function definitions)\n';
     }
     
-    output += '\n🎯 Execution completed in virtual environment!\n';
-    output += `📊 Memory usage: ${Math.round(Math.random() * 100 + 50)}MB\n`;
-    output += `⏱️ Execution time: ${Math.round(Math.random() * 2000 + 500)}ms\n`;
-    
     return output;
   };
 
@@ -412,9 +463,10 @@ print("✅ Package management")
     
     const command = commandInput.trim();
     setCommandHistory(prev => [...prev, command]);
+    setHistoryIndex(-1);
     setCommandInput('');
     
-    setCommandOutput(prev => prev + `(env) $ ${command}\n`);
+    appendToTerminal(`(env) ${currentDirectory}>${command}`);
     
     await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
     
@@ -423,7 +475,7 @@ print("✅ Package management")
     // Enhanced command simulation
     if (command.startsWith('pip install')) {
       const packageName = command.replace('pip install ', '');
-      result = `Collecting ${packageName}\n  Downloading ${packageName}...\n  Installing collected packages: ${packageName}\nSuccessfully installed ${packageName}\n`;
+      result = `Collecting ${packageName}\n  Downloading ${packageName}...\n  Installing collected packages: ${packageName}\nSuccessfully installed ${packageName}`;
       
       // Add to installed packages
       const newPackage: PackageInfo = {
@@ -443,11 +495,11 @@ print("✅ Package management")
       
     } else if (command.startsWith('pip uninstall')) {
       const packageName = command.replace('pip uninstall ', '').replace(' -y', '');
-      result = `Uninstalling ${packageName}:\nSuccessfully uninstalled ${packageName}\n`;
+      result = `Uninstalling ${packageName}:\nSuccessfully uninstalled ${packageName}`;
       setInstalledPackages(prev => prev.filter(pkg => pkg.name !== packageName));
       
     } else if (command === 'python --version') {
-      result = 'Python 3.11.4\n';
+      result = 'Python 3.11.4';
       
     } else if (command === 'nvidia-smi') {
       result = `+-----------------------------------------------------------------------------+
@@ -458,11 +510,12 @@ print("✅ Package management")
 |===============================+======================+======================|
 |   0  NVIDIA RTX 4090    Off  | 00000000:01:00.0  On |                  Off |
 | 30%   45C    P8    25W / 450W |   2048MiB / 24564MiB |     15%      Default |
-+-------------------------------+----------------------+----------------------+
-`;
++-------------------------------+----------------------+----------------------+`;
       
-    } else if (command === 'ls' || command === 'dir') {
-      result = files.map(f => `${f.name.padEnd(20)} ${f.size.toString().padStart(8)} bytes  ${f.lastModified.toLocaleDateString()}`).join('\n') + '\n';
+    } else if (command === 'dir' || command === 'ls') {
+      result = ` Volume in drive C has no label.\n Volume Serial Number is 1234-5678\n\n Directory of ${currentDirectory}\n\n`;
+      result += files.map(f => `${f.lastModified.toLocaleDateString().padEnd(10)} ${f.lastModified.toLocaleTimeString().padEnd(8)} ${f.size.toString().padStart(8)} ${f.name}`).join('\n');
+      result += `\n               ${files.length} File(s)     ${files.reduce((sum, f) => sum + f.size, 0)} bytes\n               0 Dir(s)  1,234,567,890 bytes free`;
       
     } else if (command.startsWith('python ')) {
       const filename = command.replace('python ', '');
@@ -470,49 +523,54 @@ print("✅ Package management")
       if (file) {
         result = await simulatePythonExecution(file.content);
       } else {
-        result = `python: can't open file '${filename}': [Errno 2] No such file or directory\n`;
+        result = `python: can't open file '${filename}': [Errno 2] No such file or directory`;
       }
       
-    } else if (command.startsWith('cat ') || command.startsWith('type ')) {
+    } else if (command.startsWith('type ') || command.startsWith('cat ')) {
       const filename = command.split(' ')[1];
       const file = files.find(f => f.name === filename);
       if (file) {
-        result = file.content + '\n';
+        result = file.content;
       } else {
-        result = `File '${filename}' not found\n`;
+        result = `The system cannot find the file specified.`;
       }
       
     } else if (command === 'jupyter lab') {
-      result = 'Starting Jupyter Lab...\n[I] Jupyter Lab is running at: http://localhost:8888/lab\n[I] Use Control-C to stop this server\n';
+      result = 'Starting Jupyter Lab...\n[I] Jupyter Lab is running at: http://localhost:8888/lab\n[I] Use Control-C to stop this server';
       
-    } else if (command === 'clear') {
-      setCommandOutput('');
+    } else if (command === 'cls' || command === 'clear') {
+      setTerminalOutput('Microsoft Windows [Version 10.0.22631.4602]\n(c) Microsoft Corporation. All rights reserved.\n\n');
       return;
       
-    } else if (command === 'pwd') {
-      result = '/workspace/python-environment\n';
+    } else if (command === 'cd..') {
+      setCurrentDirectory('C:\\workspace');
+      result = '';
       
-    } else if (command === 'whoami') {
-      result = 'python-developer\n';
+    } else if (command.startsWith('cd ')) {
+      const newDir = command.replace('cd ', '');
+      setCurrentDirectory(`${currentDirectory}\\${newDir}`);
+      result = '';
+      
+    } else if (command === 'echo %cd%') {
+      result = currentDirectory;
       
     } else if (command.startsWith('echo ')) {
-      result = command.replace('echo ', '') + '\n';
+      result = command.replace('echo ', '');
       
-    } else if (command === 'env') {
-      result = `VIRTUAL_ENV=/workspace/python-environment/env
-PATH=/workspace/python-environment/env/bin:$PATH
+    } else if (command === 'set') {
+      result = `VIRTUAL_ENV=${currentDirectory}\\env
+PATH=${currentDirectory}\\env\\Scripts;%PATH%
 PYTHON_VERSION=3.11.4
-CUDA_VERSION=12.2
-`;
+CUDA_VERSION=12.2`;
       
     } else if (command.startsWith('mkdir ')) {
       const dirName = command.replace('mkdir ', '');
-      result = `Directory '${dirName}' created\n`;
+      result = `Directory '${dirName}' created`;
       
-    } else if (command.startsWith('rm ') || command.startsWith('del ')) {
+    } else if (command.startsWith('del ') || command.startsWith('rm ')) {
       const filename = command.split(' ')[1];
       setFiles(prev => prev.filter(f => f.name !== filename));
-      result = `File '${filename}' deleted\n`;
+      result = `File '${filename}' deleted`;
       
     } else if (command === 'git status') {
       result = `On branch main
@@ -524,14 +582,16 @@ Changes not staged for commit:
 
         modified:   ${selectedFile}
 
-no changes added to commit (use "git add" and "git commit")
-`;
+no changes added to commit (use "git add" and "git commit")`;
       
     } else {
-      result = `Command '${command}' not found. Available commands: pip, python, ls, dir, cat, type, clear, pwd, whoami, echo, nvidia-smi, jupyter, env, mkdir, rm, del, git\n`;
+      result = `'${command}' is not recognized as an internal or external command,
+operable program or batch file.`;
     }
     
-    setCommandOutput(prev => prev + result + '\n');
+    appendToTerminal(result);
+    appendToTerminal('');
+    appendToTerminal(`(env) ${currentDirectory}>`);
     
     if (onExplain) {
       onExplain(`Executed command: "${command}". The virtual environment supports all standard Python development commands including package management, file operations, and system utilities.`);
@@ -544,28 +604,28 @@ no changes added to commit (use "git add" and "git commit")
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (commandHistory.length > 0) {
-        setCommandInput(commandHistory[commandHistory.length - 1]);
+        const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
+        setHistoryIndex(newIndex);
+        setCommandInput(commandHistory[newIndex]);
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIndex !== -1) {
+        const newIndex = historyIndex + 1;
+        if (newIndex >= commandHistory.length) {
+          setHistoryIndex(-1);
+          setCommandInput('');
+        } else {
+          setHistoryIndex(newIndex);
+          setCommandInput(commandHistory[newIndex]);
+        }
       }
     }
   };
 
-  const stopExecution = () => {
-    setIsRunning(false);
-    setOutput(prev => prev + '\n⏹️ Execution stopped by user');
-    
-    if (onExplain) {
-      onExplain("Code execution has been stopped. You can modify your code and run it again whenever you're ready.");
-    }
-  };
-
-  const clearOutput = () => {
-    if (isCommandMode) {
-      setCommandOutput('');
-    } else {
-      setOutput('');
-      setExecutionTime(0);
-      setMemoryUsage(0);
-    }
+  const clearTerminal = () => {
+    setTerminalOutput('Microsoft Windows [Version 10.0.22631.4602]\n(c) Microsoft Corporation. All rights reserved.\n\n');
+    appendToTerminal(`(env) ${currentDirectory}>`);
   };
 
   const createNewFile = () => {
@@ -616,7 +676,7 @@ no changes added to commit (use "git add" and "git commit")
   };
 
   const deleteFile = (fileName: string) => {
-    if (files.length <= 1) return;
+    if (files.length <= 1 || fileName === 'config.json') return;
     
     setFiles(prev => prev.filter(f => f.name !== fileName));
     if (selectedFile === fileName) {
@@ -690,27 +750,27 @@ no changes added to commit (use "git add" and "git commit")
   );
 
   return (
-    <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50 rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-      {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 px-6 py-4 border-b border-gray-200">
+    <div className={`bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 rounded-3xl shadow-2xl border-2 border-slate-700 overflow-hidden transition-all duration-500 ${isMaximized ? 'fixed inset-4 z-50' : ''}`}>
+      {/* Enhanced Header with Windows-style design */}
+      <div className="bg-gradient-to-r from-slate-800 via-blue-800 to-indigo-800 px-6 py-4 border-b-2 border-slate-600 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-3 rounded-xl shadow-lg">
-              <Terminal className="h-6 w-6 text-white" />
+            <div className="bg-gradient-to-br from-green-400 to-blue-500 p-3 rounded-xl shadow-lg border border-green-300">
+              <Monitor className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white">Professional Python Environment</h3>
+              <h3 className="text-xl font-bold text-white">Professional Python Development Environment</h3>
               <div className="flex items-center gap-4 mt-1">
-                <span className="px-3 py-1 bg-green-500/20 text-green-100 text-xs rounded-full font-medium border border-green-400/30">
-                  ✅ Virtual Environment
+                <span className="px-3 py-1 bg-green-500/30 text-green-200 text-xs rounded-full font-medium border border-green-400/50 shadow-sm">
+                  ✅ Virtual Environment Active
                 </span>
-                <span className="px-3 py-1 bg-blue-500/20 text-blue-100 text-xs rounded-full font-medium border border-blue-400/30">
-                  🔥 CUDA Enabled
+                <span className="px-3 py-1 bg-blue-500/30 text-blue-200 text-xs rounded-full font-medium border border-blue-400/50 shadow-sm">
+                  🔥 CUDA GPU Enabled
                 </span>
-                <span className="px-3 py-1 bg-purple-500/20 text-purple-100 text-xs rounded-full font-medium border border-purple-400/30">
-                  📦 Full Libraries
+                <span className="px-3 py-1 bg-purple-500/30 text-purple-200 text-xs rounded-full font-medium border border-purple-400/50 shadow-sm">
+                  📦 Full ML Libraries
                 </span>
-                <span className="px-3 py-1 bg-yellow-500/20 text-yellow-100 text-xs rounded-full font-medium border border-yellow-400/30">
+                <span className="px-3 py-1 bg-yellow-500/30 text-yellow-200 text-xs rounded-full font-medium border border-yellow-400/50 shadow-sm">
                   🚀 Production Ready
                 </span>
               </div>
@@ -719,81 +779,74 @@ no changes added to commit (use "git add" and "git commit")
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowPackageManager(!showPackageManager)}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl text-sm transition-all duration-300 border border-white/30"
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl text-sm transition-all duration-300 border border-white/30 shadow-lg hover:shadow-xl"
             >
-              📦 Packages
-            </button>
-            <button
-              onClick={() => setIsCommandMode(!isCommandMode)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
-                isCommandMode 
-                  ? 'bg-white/20 text-white border border-white/30' 
-                  : 'bg-white/10 text-white/80 hover:bg-white/20'
-              }`}
-            >
-              <Command className="h-4 w-4" />
-              {isCommandMode ? 'Code Mode' : 'Terminal Mode'}
+              📦 Packages ({installedPackages.length})
             </button>
             <button
               onClick={saveCurrentFile}
-              className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm transition-all duration-300 border border-white/30"
+              className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm transition-all duration-300 border border-white/30 shadow-lg hover:shadow-xl"
             >
               <Save className="h-4 w-4" />
               Save
             </button>
-            {!isCommandMode && (
-              <button
-                onClick={executeCode}
-                disabled={isRunning}
-                className="flex items-center gap-2 bg-white hover:bg-gray-100 disabled:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                {isRunning ? (
-                  <RotateCcw className="h-4 w-4 animate-spin" />
-                ) : (
+            <button
+              onClick={executeCode}
+              disabled={false}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                isRunning 
+                  ? 'bg-red-500 hover:bg-red-600 text-white' 
+                  : 'bg-white hover:bg-gray-100 text-gray-800'
+              }`}
+            >
+              {isRunning ? (
+                <>
+                  <Square className="h-4 w-4" />
+                  Stop Execution
+                </>
+              ) : (
+                <>
                   <Play className="h-4 w-4" />
-                )}
-                {isRunning ? 'Running...' : 'Execute'}
-              </button>
-            )}
-            {isRunning && (
-              <button
-                onClick={stopExecution}
-                className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-medium transition-all duration-300"
-              >
-                <Square className="h-4 w-4" />
-                Stop
-              </button>
-            )}
+                  Execute Python
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => setIsMaximized(!isMaximized)}
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl text-sm transition-all duration-300 border border-white/30"
+            >
+              {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 p-6">
-        {/* Enhanced File Explorer with Project Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 p-6 bg-gradient-to-br from-slate-50 to-blue-50">
+        {/* Enhanced File Explorer with Windows-style design */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
               <Folder className="h-4 w-4 text-blue-600" />
               Project Workspace
             </h4>
             <div className="flex gap-1">
               <button
                 onClick={() => setShowFileDialog(true)}
-                className="p-2 text-gray-600 hover:bg-blue-100 rounded-lg transition-all duration-300 hover:scale-110"
+                className="p-2 text-slate-600 hover:bg-blue-100 rounded-lg transition-all duration-300 hover:scale-110 shadow-sm"
                 title="New file"
               >
                 <FileText className="h-4 w-4" />
               </button>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 text-gray-600 hover:bg-green-100 rounded-lg transition-all duration-300 hover:scale-110"
+                className="p-2 text-slate-600 hover:bg-green-100 rounded-lg transition-all duration-300 hover:scale-110 shadow-sm"
                 title="Upload file"
               >
                 <Upload className="h-4 w-4" />
               </button>
               <button
                 onClick={downloadAllFiles}
-                className="p-2 text-gray-600 hover:bg-purple-100 rounded-lg transition-all duration-300 hover:scale-110"
+                className="p-2 text-slate-600 hover:bg-purple-100 rounded-lg transition-all duration-300 hover:scale-110 shadow-sm"
                 title="Download all files"
               >
                 <Download className="h-4 w-4" />
@@ -802,19 +855,19 @@ no changes added to commit (use "git add" and "git commit")
           </div>
           
           {/* Project Statistics */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 border border-blue-200">
-            <h5 className="font-semibold text-blue-800 mb-2 text-sm">Project Stats</h5>
-            <div className="grid grid-cols-3 gap-2 text-xs text-blue-700">
-              <div className="text-center">
-                <div className="font-bold">{projectStats.totalFiles}</div>
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-xl p-4 border-2 border-blue-200 shadow-lg">
+            <h5 className="font-semibold text-blue-800 mb-3 text-sm">Project Statistics</h5>
+            <div className="grid grid-cols-3 gap-3 text-xs text-blue-700">
+              <div className="text-center bg-white/50 rounded-lg p-2">
+                <div className="font-bold text-lg">{projectStats.totalFiles}</div>
                 <div>Files</div>
               </div>
-              <div className="text-center">
-                <div className="font-bold">{projectStats.totalLines}</div>
+              <div className="text-center bg-white/50 rounded-lg p-2">
+                <div className="font-bold text-lg">{projectStats.totalLines}</div>
                 <div>Lines</div>
               </div>
-              <div className="text-center">
-                <div className="font-bold">{(projectStats.totalSize / 1024).toFixed(1)}KB</div>
+              <div className="text-center bg-white/50 rounded-lg p-2">
+                <div className="font-bold text-lg">{(projectStats.totalSize / 1024).toFixed(1)}KB</div>
                 <div>Size</div>
               </div>
             </div>
@@ -824,25 +877,25 @@ no changes added to commit (use "git add" and "git commit")
             {files.map((file) => (
               <div
                 key={file.name}
-                className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-300 ${
+                className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-300 shadow-sm ${
                   selectedFile === file.name 
-                    ? 'bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 shadow-lg' 
-                    : 'hover:bg-gray-50 border border-gray-200'
+                    ? 'bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 shadow-lg transform scale-105' 
+                    : 'hover:bg-slate-100 border-2 border-slate-200 hover:border-slate-300'
                 }`}
                 onClick={() => setSelectedFile(file.name)}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${
+                  <div className={`w-3 h-3 rounded-full shadow-sm ${
                     file.type === 'python' ? 'bg-green-500' :
                     file.type === 'json' ? 'bg-yellow-500' :
                     file.type === 'csv' ? 'bg-blue-500' :
                     file.type === 'md' ? 'bg-purple-500' :
                     file.type === 'yaml' ? 'bg-orange-500' :
-                    file.type === 'requirements' ? 'bg-red-500' : 'bg-gray-500'
+                    file.type === 'requirements' ? 'bg-red-500' : 'bg-slate-500'
                   }`}></div>
                   <div>
                     <div className="text-sm font-medium">{file.name}</div>
-                    <div className="text-xs text-gray-500">{file.size} bytes</div>
+                    <div className="text-xs text-slate-500">{file.size} bytes</div>
                   </div>
                 </div>
                 <div className="flex gap-1">
@@ -851,18 +904,18 @@ no changes added to commit (use "git add" and "git commit")
                       e.stopPropagation();
                       downloadFile(file);
                     }}
-                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                    className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
                     title="Download"
                   >
                     <Download className="h-3 w-3" />
                   </button>
-                  {files.length > 1 && (
+                  {files.length > 1 && file.name !== 'config.json' && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteFile(file.name);
                       }}
-                      className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                      className="p-1 text-slate-400 hover:text-red-600 transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="h-3 w-3" />
@@ -874,8 +927,8 @@ no changes added to commit (use "git add" and "git commit")
           </div>
           
           {/* Enhanced Environment Status */}
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-4 border border-green-200">
-            <h5 className="font-semibold text-green-800 mb-2">Environment Status</h5>
+          <div className="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-4 border-2 border-green-200 shadow-lg">
+            <h5 className="font-semibold text-green-800 mb-3">Environment Status</h5>
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${envActivated ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
@@ -897,107 +950,90 @@ no changes added to commit (use "git add" and "git commit")
           </div>
         </div>
 
-        {/* Enhanced Code Editor / Terminal */}
+        {/* Combined Code Editor and Terminal */}
         <div className="lg:col-span-3 space-y-4">
-          {!isCommandMode ? (
-            <>
-              {/* Code Editor */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <Terminal className="h-4 w-4 text-green-600" />
-                    <span>Code Editor - {selectedFile}</span>
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    Lines: {code.split('\n').length} | Size: {code.length} bytes
-                  </div>
-                </div>
-                
-                <div className="bg-gray-900 rounded-xl overflow-hidden shadow-2xl">
-                  <div className="bg-gray-800 px-4 py-3 text-gray-300 text-sm font-mono flex items-center justify-between border-b border-gray-700">
-                    <span className="flex items-center gap-2">
-                      <div className="flex gap-1">
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      </div>
-                      {selectedFile}
-                    </span>
-                    <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">Python 3.11 + CUDA + ML</span>
-                  </div>
-                  <textarea
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    className="w-full h-80 p-4 bg-gray-900 text-gray-100 font-mono text-sm resize-none focus:outline-none"
-                    placeholder="Write your Python code here... Import local files, process data, train models, and more!"
-                    spellCheck={false}
-                  />
-                </div>
+          {/* Code Editor */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <Terminal className="h-4 w-4 text-green-600" />
+                <span>Code Editor - {selectedFile}</span>
+                {selectedFile === 'config.json' && (
+                  <span className="px-2 py-1 bg-red-100 text-red-600 text-xs rounded-full">Protected</span>
+                )}
               </div>
+              <div className="text-xs text-slate-500">
+                Lines: {code.split('\n').length} | Size: {code.length} bytes
+              </div>
+            </div>
+            
+            <div className="bg-slate-900 rounded-xl overflow-hidden shadow-2xl border-2 border-slate-700">
+              <div className="bg-slate-800 px-4 py-3 text-slate-300 text-sm font-mono flex items-center justify-between border-b-2 border-slate-700">
+                <span className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <div className="w-3 h-3 bg-red-500 rounded-full shadow-sm"></div>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full shadow-sm"></div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div>
+                  </div>
+                  {selectedFile}
+                </span>
+                <span className="text-xs bg-green-600 text-white px-3 py-1 rounded-full shadow-sm">Python 3.11 + CUDA + ML</span>
+              </div>
+              <textarea
+                value={code}
+                onChange={(e) => selectedFile !== 'config.json' && setCode(e.target.value)}
+                className="w-full h-80 p-4 bg-slate-900 text-slate-100 font-mono text-sm resize-none focus:outline-none"
+                placeholder={selectedFile === 'config.json' ? 'Configuration files are protected and cannot be modified.' : 'Write your Python code here... Import local files, process data, train models, and more!'}
+                spellCheck={false}
+                readOnly={selectedFile === 'config.json'}
+              />
+            </div>
+          </div>
 
-              {/* Output Terminal */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <Terminal className="h-4 w-4 text-blue-600" />
-                    Output Terminal
-                  </h4>
-                  <div className="flex gap-2">
-                    {executionTime > 0 && (
-                      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
-                        ⏱️ {executionTime}ms
-                      </span>
-                    )}
-                    {memoryUsage > 0 && (
-                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                        🧠 {memoryUsage.toFixed(1)}MB
-                      </span>
-                    )}
-                    <button
-                      onClick={clearOutput}
-                      className="text-xs text-gray-500 hover:text-gray-700 transition-colors px-3 py-1 rounded-lg hover:bg-gray-100"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="bg-black rounded-xl p-4 h-64 overflow-y-auto shadow-inner">
-                  <pre className="text-green-400 font-mono text-sm whitespace-pre-wrap">
-                    {output || '🐍 Professional Python environment ready for execution...\n💡 This environment supports:\n  • Full NumPy, Pandas, ML libraries\n  • CUDA GPU acceleration\n  • File I/O operations\n  • Package management\n  • Local file imports\n  • Data visualization\n  • API requests\n\nClick "Execute" to run your code or switch to Terminal mode for command-line access.'}
-                  </pre>
-                </div>
+          {/* Windows CMD-style Terminal */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <Command className="h-4 w-4 text-blue-600" />
+                Windows Command Prompt - Virtual Environment
+              </h4>
+              <div className="flex gap-2">
+                {executionTime > 0 && (
+                  <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full shadow-sm">
+                    ⏱️ {executionTime}ms
+                  </span>
+                )}
+                {memoryUsage > 0 && (
+                  <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full shadow-sm">
+                    🧠 {memoryUsage.toFixed(1)}MB
+                  </span>
+                )}
+                <button
+                  onClick={clearTerminal}
+                  className="text-xs text-slate-500 hover:text-slate-700 transition-colors px-3 py-1 rounded-lg hover:bg-slate-100 shadow-sm"
+                >
+                  Clear
+                </button>
               </div>
-            </>
-          ) : (
-            /* Enhanced Command Terminal */
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <Command className="h-4 w-4 text-purple-600" />
-                <span>Command Terminal - Virtual Environment</span>
+            </div>
+            
+            <div className="bg-black rounded-xl overflow-hidden shadow-2xl border-2 border-slate-700">
+              <div className="bg-slate-800 px-4 py-3 text-slate-300 text-sm font-mono flex items-center justify-between border-b-2 border-slate-700">
+                <span className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  Command Prompt - Virtual Environment Active
+                </span>
+                <span className="text-xs text-slate-400">Windows 10 Pro</span>
               </div>
               
-              <div className="bg-black rounded-xl overflow-hidden shadow-2xl">
-                <div className="bg-gray-800 px-4 py-3 text-gray-300 text-sm font-mono flex items-center justify-between border-b border-gray-700">
-                  <span className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    Terminal - Virtual Environment Active
-                  </span>
-                  <button
-                    onClick={clearOutput}
-                    className="text-xs text-gray-400 hover:text-white transition-colors px-2 py-1 rounded hover:bg-gray-700"
-                  >
-                    Clear
-                  </button>
-                </div>
-                
-                <div className="p-4 h-80 overflow-y-auto">
+              <div className="h-80 overflow-y-auto">
+                <div ref={terminalRef} className="p-4">
                   <pre className="text-green-400 font-mono text-sm whitespace-pre-wrap mb-4">
-                    {commandOutput}
+                    {terminalOutput}
                   </pre>
                   
                   <div className="flex items-center gap-2">
-                    <span className="text-green-400 font-mono text-sm">(env) $</span>
+                    <span className="text-green-400 font-mono text-sm">(env) {currentDirectory}</span>
                     <input
                       ref={commandInputRef}
                       type="text"
@@ -1005,48 +1041,48 @@ no changes added to commit (use "git add" and "git commit")
                       onChange={(e) => setCommandInput(e.target.value)}
                       onKeyDown={handleCommandKeyPress}
                       className="flex-1 bg-transparent text-green-400 font-mono text-sm focus:outline-none"
-                      placeholder="Type commands here... (pip, python, jupyter, git, etc.)"
+                      placeholder="Type commands here... (pip, python, dir, cls, etc.)"
                     />
                   </div>
                 </div>
               </div>
-              
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4 border border-purple-200">
-                <h5 className="font-semibold text-purple-800 mb-2">Available Commands</h5>
-                <div className="grid grid-cols-3 gap-2 text-xs text-purple-700">
-                  <div>• pip install/uninstall</div>
-                  <div>• python [file.py]</div>
-                  <div>• jupyter lab</div>
-                  <div>• pip list</div>
-                  <div>• ls / dir</div>
-                  <div>• git status</div>
-                  <div>• nvidia-smi</div>
-                  <div>• cat/type [file]</div>
-                  <div>• env</div>
-                  <div>• clear</div>
-                  <div>• mkdir [dir]</div>
-                  <div>• rm/del [file]</div>
-                </div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4 border-2 border-purple-200 shadow-lg">
+              <h5 className="font-semibold text-purple-800 mb-3">Available Commands</h5>
+              <div className="grid grid-cols-4 gap-2 text-xs text-purple-700">
+                <div>• pip install/uninstall</div>
+                <div>• python [file.py]</div>
+                <div>• jupyter lab</div>
+                <div>• pip list</div>
+                <div>• dir / ls</div>
+                <div>• git status</div>
+                <div>• nvidia-smi</div>
+                <div>• type/cat [file]</div>
+                <div>• cls / clear</div>
+                <div>• cd [directory]</div>
+                <div>• mkdir [dir]</div>
+                <div>• del/rm [file]</div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
       {/* Package Manager Modal */}
       {showPackageManager && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-4/5 max-w-4xl max-h-3/4 shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 w-4/5 max-w-4xl max-h-3/4 shadow-2xl border-2 border-slate-300">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 📦 Package Manager
-                <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
+                <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full">
                   {installedPackages.length} installed
                 </span>
               </h3>
               <button
                 onClick={() => setShowPackageManager(false)}
-                className="text-gray-500 hover:text-gray-700 text-xl"
+                className="text-slate-500 hover:text-slate-700 text-xl"
               >
                 ×
               </button>
@@ -1058,7 +1094,7 @@ no changes added to commit (use "git add" and "git commit")
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search packages..."
-                className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             
@@ -1066,15 +1102,15 @@ no changes added to commit (use "git add" and "git commit")
               {filteredPackages.map((pkg) => (
                 <div
                   key={pkg.name}
-                  className="flex items-center justify-between p-3 border border-gray-200 rounded-xl hover:bg-gray-50"
+                  className="flex items-center justify-between p-3 border-2 border-slate-200 rounded-xl hover:bg-slate-50 shadow-sm"
                 >
                   <div>
                     <div className="font-medium">{pkg.name}</div>
-                    <div className="text-sm text-gray-600">{pkg.description}</div>
+                    <div className="text-sm text-slate-600">{pkg.description}</div>
                     <div className="text-xs text-blue-600">Version: {pkg.version}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                       Installed
                     </span>
                   </div>
@@ -1088,23 +1124,23 @@ no changes added to commit (use "git add" and "git commit")
       {/* New File Dialog */}
       {showFileDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-96 shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 w-96 shadow-2xl border-2 border-slate-300">
             <h3 className="text-lg font-semibold mb-4">Create New File</h3>
             <input
               type="text"
               value={newFileName}
               onChange={(e) => setNewFileName(e.target.value)}
               placeholder="Enter filename (e.g., script.py, data.csv, config.json)"
-              className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border-2 border-slate-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
               onKeyPress={(e) => e.key === 'Enter' && createNewFile()}
             />
-            <div className="text-xs text-gray-600 mb-4">
+            <div className="text-xs text-slate-600 mb-4">
               Supported: .py, .json, .csv, .md, .yaml, .txt, requirements.txt
             </div>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowFileDialog(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
               >
                 Cancel
               </button>

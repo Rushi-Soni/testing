@@ -2,7 +2,7 @@
 ## From Beginner to Professor Level
 
 ### Course Overview
-This comprehensive Python programming course takes you from absolute beginner to professor-level expertise. Each topic builds upon previous knowledge while introducing advanced concepts and real-world applications.
+This comprehensive Python programming course takes you from absolute beginner to professor-level expertise. Each topic builds upon previous knowledge while introducing advanced concepts and real-world applications with hands-on coding experience.
 
 ---
 
@@ -58,6 +58,26 @@ student_info = {"name": "Alice", "age": 20}  # Dictionary
 - List append() is O(1) amortized, insert() is O(n)
 - Dictionary lookups are O(1) average case
 - String concatenation with + in loops is inefficient
+
+**Interactive Code Example:**
+```python
+# Variable declarations and memory allocation
+student_name = "Alice Johnson"     # String stored in heap
+student_age = 20                   # Number stored in stack
+is_enrolled = True                 # Boolean stored in stack
+grades = [85, 92, 78, 96]         # Array object stored in heap
+
+print("Student Information:")
+print(f"Name: {student_name} (Type: {type(student_name).__name__})")
+print(f"Age: {student_age} (Type: {type(student_age).__name__})")
+print(f"Enrolled: {is_enrolled} (Type: {type(is_enrolled).__name__})")
+
+# Memory analysis
+import sys
+print(f"String size: {sys.getsizeof(student_name)} bytes")
+print(f"Integer size: {sys.getsizeof(student_age)} bytes")
+print(f"List size: {sys.getsizeof(grades)} bytes")
+```
 
 ---
 
@@ -121,6 +141,36 @@ Pythonic way to create lists with filtering and transformation:
 ```python
 passing_scores = [s['score'] for s in students if s['score'] >= 70]
 grade_status = [f"{s['name']}: {'PASS' if s['score'] >= 70 else 'FAIL'}" for s in students]
+```
+
+**Interactive Code Example:**
+```python
+# Advanced conditional logic with multiple criteria
+def analyze_student_status(age, gpa, credits, is_international):
+    if age < 16:
+        status = "Too young for enrollment"
+    elif age >= 16 and gpa >= 3.5 and credits >= 120:
+        if is_international:
+            status = "International honors graduate candidate"
+        else:
+            status = "Domestic honors graduate candidate"
+    elif age >= 18 and gpa >= 2.0 and credits >= 60:
+        status = "Regular student in good standing"
+    else:
+        status = "Special case - manual review required"
+    
+    return status
+
+# Test cases
+students = [
+    (22, 3.8, 125, True),   # International honors
+    (19, 3.2, 75, False),   # Regular student
+    (20, 1.8, 45, False),   # Academic probation
+]
+
+for i, (age, gpa, credits, is_intl) in enumerate(students, 1):
+    status = analyze_student_status(age, gpa, credits, is_intl)
+    print(f"Student {i}: {status}")
 ```
 
 #### Performance Notes
@@ -195,6 +245,49 @@ def outer_function(x):
     def inner_function(y):
         return x + y  # x is captured from enclosing scope
     return inner_function
+```
+
+**Interactive Code Example:**
+```python
+# Advanced function with multiple parameter types
+def calculate_statistics(numbers: List[float], 
+                        precision: int = 2, 
+                        include_median: bool = True,
+                        *additional_stats: str,
+                        **options: Any) -> Dict[str, Any]:
+    if not numbers:
+        return {"error": "Empty list provided"}
+    
+    # Basic statistics
+    total = sum(numbers)
+    count = len(numbers)
+    mean = total / count
+    
+    # Build results dictionary
+    results = {
+        "count": count,
+        "sum": round(total, precision),
+        "mean": round(mean, precision),
+        "min": min(numbers),
+        "max": max(numbers),
+    }
+    
+    # Optional median calculation
+    if include_median:
+        sorted_nums = sorted(numbers)
+        n = len(sorted_nums)
+        if n % 2 == 0:
+            median = (sorted_nums[n//2 - 1] + sorted_nums[n//2]) / 2
+        else:
+            median = sorted_nums[n//2]
+        results["median"] = round(median, precision)
+    
+    return results
+
+# Test the function
+test_data = [85, 92, 78, 96, 88, 91, 87, 93, 89, 94]
+stats = calculate_statistics(test_data, precision=3, include_median=True)
+print("Statistics:", stats)
 ```
 
 #### Memory and Performance
@@ -273,6 +366,56 @@ class AccountFactory:
                                 kwargs.get('min_balance', 100))
 ```
 
+**Interactive Code Example:**
+```python
+# Complete OOP example with inheritance and polymorphism
+from abc import ABC, abstractmethod
+from enum import Enum
+
+class AccountType(Enum):
+    CHECKING = "checking"
+    SAVINGS = "savings"
+
+class BankAccount(ABC):
+    _total_accounts = 0
+    
+    def __init__(self, account_number: str, owner_name: str, initial_balance: float = 0):
+        self._account_number = account_number
+        self._owner_name = owner_name
+        self._balance = initial_balance
+        BankAccount._total_accounts += 1
+    
+    @property
+    def balance(self) -> float:
+        return self._balance
+    
+    @abstractmethod
+    def calculate_interest(self) -> float:
+        pass
+    
+    def deposit(self, amount: float) -> bool:
+        if amount > 0:
+            self._balance += amount
+            return True
+        return False
+
+class CheckingAccount(BankAccount):
+    def calculate_interest(self) -> float:
+        return self._balance * 0.001
+    
+    def withdraw(self, amount: float) -> bool:
+        if amount <= self._balance:
+            self._balance -= amount
+            return True
+        return False
+
+# Demonstration
+checking = CheckingAccount("123456", "Alice Johnson", 1000)
+checking.deposit(500)
+print(f"Balance: ${checking.balance}")
+print(f"Interest: ${checking.calculate_interest():.2f}")
+```
+
 #### Encapsulation
 - Use underscore prefix for protected attributes
 - Property decorators provide controlled access
@@ -346,6 +489,47 @@ correlation_matrix = np.corrcoef([sales_array, quantities, prices])
 q1, q3 = np.percentile(sales_array, [25, 75])
 iqr = q3 - q1
 outliers = sales_array[(sales_array < q1 - 1.5 * iqr) | (sales_array > q3 + 1.5 * iqr)]
+```
+
+**Interactive Code Example:**
+```python
+# NumPy fundamentals and performance analysis
+import numpy as np
+import time
+
+# Array creation and basic properties
+array_1d = np.array([1, 2, 3, 4, 5])
+array_2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+print(f"1D array: {array_1d}")
+print(f"2D shape: {array_2d.shape}, dtype: {array_2d.dtype}")
+
+# Performance comparison: vectorized vs loops
+size = 100000
+array_a = np.random.random(size)
+array_b = np.random.random(size)
+
+# Python loop approach
+start_time = time.time()
+python_result = []
+for i in range(len(array_a)):
+    python_result.append(array_a[i] * array_b[i])
+python_time = time.time() - start_time
+
+# NumPy vectorized approach
+start_time = time.time()
+numpy_result = array_a * array_b
+numpy_time = time.time() - start_time
+
+print(f"Python loop time: {python_time:.4f} seconds")
+print(f"NumPy vectorized time: {numpy_time:.4f} seconds")
+print(f"Speedup: {python_time / numpy_time:.1f}x faster")
+
+# Statistical operations
+sales_data = np.random.normal(1000, 200, (12, 4))  # 12 months, 4 regions
+print(f"Sales data shape: {sales_data.shape}")
+print(f"Overall mean: ${np.mean(sales_data):.2f}")
+print(f"Overall std: ${np.std(sales_data):.2f}")
 ```
 
 #### Memory Optimization
@@ -439,6 +623,75 @@ grid_search = GridSearchCV(pipeline, param_grid, cv=5, scoring='accuracy')
 grid_search.fit(X_train, y_train)
 ```
 
+**Interactive Code Example:**
+```python
+# Complete machine learning pipeline
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, accuracy_score
+
+# Generate synthetic customer data
+np.random.seed(42)
+n_samples = 1000
+
+# Customer features
+age = np.random.normal(40, 15, n_samples).clip(18, 80)
+income = np.random.normal(50000, 20000, n_samples).clip(20000, 150000)
+monthly_charges = np.random.normal(70, 25, n_samples).clip(20, 150)
+
+# Create churn probability based on features
+churn_prob = (
+    0.3 * (monthly_charges > 80) +
+    0.2 * (age < 30) +
+    0.1 * np.random.random(n_samples)
+)
+
+# Generate binary churn labels
+churn = (churn_prob > 0.4).astype(int)
+
+# Create DataFrame
+df = pd.DataFrame({
+    'age': age.round(0).astype(int),
+    'income': income.round(2),
+    'monthly_charges': monthly_charges.round(2),
+    'churn': churn
+})
+
+print(f"Dataset shape: {df.shape}")
+print(f"Churn rate: {df['churn'].mean():.3f}")
+
+# Prepare features and target
+X = df.drop('churn', axis=1)
+y = df['churn']
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Create and train model
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+model = RandomForestClassifier(random_state=42, n_estimators=100)
+model.fit(X_train_scaled, y_train)
+
+# Evaluate model
+train_score = model.score(X_train_scaled, y_train)
+test_score = model.score(X_test_scaled, y_test)
+
+print(f"Training accuracy: {train_score:.4f}")
+print(f"Test accuracy: {test_score:.4f}")
+
+# Cross-validation
+cv_scores = cross_val_score(model, X_train_scaled, y_train, cv=5)
+print(f"CV Score: {cv_scores.mean():.4f} (+/- {cv_scores.std() * 2:.4f})")
+```
+
 #### Performance Considerations
 - Feature scaling improves linear model performance
 - Tree-based models handle mixed data types well
@@ -521,6 +774,118 @@ def search(query: str, top_k: int = 5) -> List[RetrievalResult]:
     return results
 ```
 
+**Interactive Code Example:**
+```python
+# Complete RAG system implementation
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import TruncatedSVD
+from dataclasses import dataclass
+from typing import List, Dict
+
+@dataclass
+class Document:
+    id: str
+    title: str
+    content: str
+
+@dataclass
+class RetrievalResult:
+    chunk: str
+    score: float
+    document_title: str
+
+class RAGSystem:
+    def __init__(self, chunk_size: int = 500):
+        self.chunk_size = chunk_size
+        self.vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
+        self.svd = TruncatedSVD(n_components=300, random_state=42)
+        self.chunks = []
+        self.embeddings = None
+        self.documents = {}
+    
+    def add_document(self, title: str, content: str) -> str:
+        doc_id = f"doc_{len(self.documents) + 1}"
+        document = Document(id=doc_id, title=title, content=content)
+        
+        # Simple chunking
+        words = content.split()
+        for i in range(0, len(words), self.chunk_size):
+            chunk_text = " ".join(words[i:i + self.chunk_size])
+            self.chunks.append({
+                "text": chunk_text,
+                "document_id": doc_id,
+                "document_title": title
+            })
+        
+        self.documents[doc_id] = document
+        
+        # Rebuild embeddings
+        texts = [chunk["text"] for chunk in self.chunks]
+        tfidf_matrix = self.vectorizer.fit_transform(texts)
+        self.embeddings = self.svd.fit_transform(tfidf_matrix)
+        
+        return doc_id
+    
+    def query(self, question: str, top_k: int = 3) -> Dict:
+        if self.embeddings is None:
+            return {"error": "No documents in the system"}
+        
+        # Transform query
+        query_tfidf = self.vectorizer.transform([question])
+        query_embedding = self.svd.transform(query_tfidf)
+        
+        # Calculate similarities
+        similarities = cosine_similarity(query_embedding, self.embeddings)[0]
+        
+        # Get top results
+        top_indices = np.argsort(similarities)[::-1][:top_k]
+        
+        results = []
+        context_chunks = []
+        
+        for idx in top_indices:
+            chunk = self.chunks[idx]
+            results.append(RetrievalResult(
+                chunk=chunk["text"][:100] + "...",
+                score=similarities[idx],
+                document_title=chunk["document_title"]
+            ))
+            context_chunks.append(chunk["text"])
+        
+        # Simple response generation
+        combined_context = " ".join(context_chunks)
+        response = f"Based on the available information: {combined_context[:200]}..."
+        
+        return {
+            "question": question,
+            "response": response,
+            "sources": results,
+            "num_sources": len(results)
+        }
+
+# Demonstration
+rag = RAGSystem(chunk_size=100)
+
+# Add sample documents
+rag.add_document("Python Programming", 
+    "Python is a high-level programming language known for its simplicity and readability. "
+    "It supports multiple programming paradigms and has a comprehensive standard library.")
+
+rag.add_document("Machine Learning", 
+    "Machine learning is a subset of AI that enables computers to learn without explicit programming. "
+    "It includes supervised, unsupervised, and reinforcement learning approaches.")
+
+# Query the system
+result = rag.query("What is Python?")
+print(f"Question: {result['question']}")
+print(f"Response: {result['response']}")
+print(f"Sources: {result['num_sources']}")
+for source in result['sources']:
+    print(f"  - {source.document_title} (score: {source.score:.3f})")
+```
+
 #### System Architecture
 **Complete RAG Pipeline:**
 1. Document ingestion and preprocessing
@@ -553,66 +918,54 @@ def search(query: str, top_k: int = 5) -> List[RetrievalResult]:
 #### Expert Network Design
 **Individual Expert Implementation:**
 ```python
-class Expert(nn.Module):
+class Expert:
     def __init__(self, input_dim: int, hidden_dim: int, output_dim: int):
-        super(Expert, self).__init__()
-        self.fc1 = nn.Linear(input_dim, hidden_dim)
-        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
-        self.fc3 = nn.Linear(hidden_dim, output_dim)
-        self.layer_norm1 = nn.LayerNorm(hidden_dim)
-        self.layer_norm2 = nn.LayerNorm(hidden_dim)
-        self.dropout = nn.Dropout(0.1)
+        self.fc1 = np.random.randn(input_dim, hidden_dim) * np.sqrt(2.0 / input_dim)
+        self.fc2 = np.random.randn(hidden_dim, hidden_dim) * np.sqrt(2.0 / hidden_dim)
+        self.fc3 = np.random.randn(hidden_dim, output_dim) * np.sqrt(2.0 / hidden_dim)
     
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.fc1(x)
-        x = self.layer_norm1(x)
-        x = F.gelu(x)
-        x = self.dropout(x)
-        
-        x = self.fc2(x)
-        x = self.layer_norm2(x)
-        x = F.gelu(x)
-        x = self.dropout(x)
-        
-        return self.fc3(x)
+    def forward(self, x: np.ndarray) -> np.ndarray:
+        h1 = self.gelu(np.dot(x, self.fc1))
+        h2 = self.gelu(np.dot(h1, self.fc2))
+        return np.dot(h2, self.fc3)
+    
+    def gelu(self, x: np.ndarray) -> np.ndarray:
+        return 0.5 * x * (1 + np.tanh(np.sqrt(2 / np.pi) * (x + 0.044715 * x**3)))
 ```
 
 #### Gating Mechanism
 **Router Implementation:**
 ```python
-class Router(nn.Module):
+class Router:
     def __init__(self, input_dim: int, num_experts: int, top_k: int = 2):
-        super(Router, self).__init__()
-        self.gate = nn.Linear(input_dim, num_experts)
+        self.gate = np.random.randn(input_dim, num_experts) * np.sqrt(2.0 / input_dim)
         self.top_k = top_k
     
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        gate_logits = self.gate(x)
-        gates = F.softmax(gate_logits, dim=-1)
+    def forward(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray, Dict]:
+        gate_logits = np.dot(x, self.gate)
+        gates = self.softmax(gate_logits)
         
         # Select top-k experts
-        top_k_gates, top_k_indices = torch.topk(gates, self.top_k, dim=-1)
-        top_k_gates = top_k_gates / torch.sum(top_k_gates, dim=-1, keepdim=True)
+        top_k_indices = np.argpartition(gates, -self.top_k, axis=1)[:, -self.top_k:]
+        top_k_gates = np.take_along_axis(gates, top_k_indices, axis=1)
+        
+        # Normalize top-k gates
+        top_k_gates = top_k_gates / np.sum(top_k_gates, axis=1, keepdims=True)
         
         # Load balancing loss
-        expert_counts = torch.zeros(self.num_experts, device=x.device)
-        for i in range(self.num_experts):
-            expert_counts[i] = torch.sum(gates[:, i])
+        expert_counts = np.mean(gates, axis=0)
+        load_balance_loss = np.var(expert_counts) / (np.mean(expert_counts)**2 + 1e-8)
         
-        mean_load = torch.mean(expert_counts)
-        load_variance = torch.mean((expert_counts - mean_load) ** 2)
-        load_balancing_loss = load_variance / (mean_load ** 2 + 1e-8)
-        
-        return top_k_gates, top_k_indices, load_balancing_loss
+        return top_k_gates, top_k_indices, {"load_balance_loss": load_balance_loss}
 ```
 
 #### Sparse Activation
 **MoE Forward Pass:**
 ```python
-def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, Dict]:
-    gates, expert_indices, load_balance_loss = self.router(x)
+def forward(self, x: np.ndarray) -> Tuple[np.ndarray, Dict]:
+    gates, expert_indices, aux_losses = self.router.forward(x)
     
-    output = torch.zeros(x.shape[0], self.config.output_dim, device=x.device)
+    output = np.zeros((x.shape[0], self.config.output_dim))
     
     # Process through selected experts only
     for i in range(self.config.top_k):
@@ -623,11 +976,117 @@ def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, Dict]:
             expert_mask = (expert_idx == expert_id)
             if expert_mask.any():
                 expert_tokens = x[expert_mask]
-                expert_output = self.experts[expert_id](expert_tokens)
+                expert_output = self.experts[expert_id].forward(expert_tokens)
                 expert_output = expert_output * expert_gates[expert_mask]
                 output[expert_mask] += expert_output
     
-    return output, {'load_balance_loss': load_balance_loss}
+    return output, aux_losses
+```
+
+**Interactive Code Example:**
+```python
+# Mixture of Experts implementation
+import numpy as np
+from dataclasses import dataclass
+from typing import Tuple, Dict
+
+@dataclass
+class MoEConfig:
+    input_dim: int = 128
+    hidden_dim: int = 256
+    output_dim: int = 64
+    num_experts: int = 8
+    top_k: int = 2
+
+class Expert:
+    def __init__(self, input_dim: int, hidden_dim: int, output_dim: int, expert_id: int):
+        self.expert_id = expert_id
+        # Initialize weights
+        self.W1 = np.random.randn(input_dim, hidden_dim) * np.sqrt(2.0 / input_dim)
+        self.W2 = np.random.randn(hidden_dim, output_dim) * np.sqrt(2.0 / hidden_dim)
+        self.activation_count = 0
+    
+    def forward(self, x: np.ndarray) -> np.ndarray:
+        self.activation_count += 1
+        h1 = np.maximum(0, np.dot(x, self.W1))  # ReLU
+        return np.dot(h1, self.W2)
+
+class Router:
+    def __init__(self, input_dim: int, num_experts: int, top_k: int = 2):
+        self.W_gate = np.random.randn(input_dim, num_experts) * np.sqrt(2.0 / input_dim)
+        self.top_k = top_k
+        self.routing_decisions = np.zeros(num_experts)
+    
+    def forward(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray, Dict]:
+        # Compute gate probabilities
+        gate_logits = np.dot(x, self.W_gate)
+        gate_probs = self.softmax(gate_logits)
+        
+        # Select top-k experts
+        top_k_indices = np.argpartition(gate_probs, -self.top_k, axis=1)[:, -self.top_k:]
+        top_k_gates = np.take_along_axis(gate_probs, top_k_indices, axis=1)
+        top_k_gates = top_k_gates / np.sum(top_k_gates, axis=1, keepdims=True)
+        
+        # Update routing statistics
+        for i in range(x.shape[0]):
+            for expert_idx in top_k_indices[i]:
+                self.routing_decisions[expert_idx] += 1
+        
+        # Compute load balancing loss
+        expert_utilization = np.mean(gate_probs, axis=0)
+        load_balance_loss = np.var(expert_utilization) / (np.mean(expert_utilization)**2 + 1e-8)
+        
+        return top_k_gates, top_k_indices, {"load_balance_loss": load_balance_loss}
+    
+    def softmax(self, x: np.ndarray) -> np.ndarray:
+        exp_x = np.exp(x - np.max(x, axis=1, keepdims=True))
+        return exp_x / np.sum(exp_x, axis=1, keepdims=True)
+
+class MixtureOfExperts:
+    def __init__(self, config: MoEConfig):
+        self.config = config
+        self.experts = [Expert(config.input_dim, config.hidden_dim, config.output_dim, i) 
+                       for i in range(config.num_experts)]
+        self.router = Router(config.input_dim, config.num_experts, config.top_k)
+    
+    def forward(self, x: np.ndarray) -> Tuple[np.ndarray, Dict]:
+        gates, expert_indices, aux_losses = self.router.forward(x)
+        output = np.zeros((x.shape[0], self.config.output_dim))
+        
+        # Route to experts
+        for i in range(self.config.top_k):
+            for expert_id in range(self.config.num_experts):
+                mask = (expert_indices[:, i] == expert_id)
+                if mask.any():
+                    expert_output = self.experts[expert_id].forward(x[mask])
+                    output[mask] += expert_output * gates[mask, i:i+1]
+        
+        return output, aux_losses
+
+# Demonstration
+config = MoEConfig(input_dim=128, num_experts=8, top_k=2)
+moe_model = MixtureOfExperts(config)
+
+# Generate test data
+np.random.seed(42)
+test_data = np.random.randn(1000, config.input_dim)
+
+# Forward pass
+output, aux_info = moe_model.forward(test_data)
+
+print(f"Model Configuration:")
+print(f"  Number of experts: {config.num_experts}")
+print(f"  Top-k selection: {config.top_k}")
+print(f"  Theoretical speedup: {config.num_experts / config.top_k:.1f}x")
+
+print(f"\nOutput shape: {output.shape}")
+print(f"Load balance loss: {aux_info['load_balance_loss']:.6f}")
+
+# Expert utilization
+expert_activations = [expert.activation_count for expert in moe_model.experts]
+print(f"\nExpert utilization:")
+for i, activations in enumerate(expert_activations):
+    print(f"  Expert {i}: {activations} activations")
 ```
 
 #### Load Balancing
@@ -764,6 +1223,91 @@ def process_management(action, process_name=None, pid=None):
         return matching
 ```
 
+**Interactive Code Example:**
+```python
+# Advanced system management tool
+import argparse
+import subprocess
+import os
+import psutil
+import json
+from pathlib import Path
+from datetime import datetime
+
+class SystemManager:
+    def __init__(self):
+        self.operations_log = []
+    
+    def get_system_info(self):
+        return {
+            "platform": {
+                "system": os.name,
+                "python_version": sys.version
+            },
+            "cpu": {
+                "physical_cores": psutil.cpu_count(logical=False),
+                "logical_cores": psutil.cpu_count(logical=True),
+                "cpu_usage": psutil.cpu_percent(interval=1)
+            },
+            "memory": {
+                "total_gb": round(psutil.virtual_memory().total / (1024**3), 2),
+                "available_gb": round(psutil.virtual_memory().available / (1024**3), 2),
+                "percentage_used": psutil.virtual_memory().percent
+            }
+        }
+    
+    def execute_command(self, command, timeout=30):
+        try:
+            result = subprocess.run(
+                command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=timeout
+            )
+            
+            return {
+                "command": command,
+                "return_code": result.returncode,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+                "success": result.returncode == 0
+            }
+        except subprocess.TimeoutExpired:
+            return {"error": "Command timed out", "command": command}
+    
+    def list_processes(self):
+        processes = []
+        for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
+            try:
+                processes.append(proc.info)
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
+        return sorted(processes, key=lambda x: x.get('cpu_percent', 0), reverse=True)
+
+# Demonstration
+manager = SystemManager()
+
+print("=== Python System Manager ===")
+
+# System information
+sys_info = manager.get_system_info()
+print(f"CPU Cores: {sys_info['cpu']['physical_cores']} physical, {sys_info['cpu']['logical_cores']} logical")
+print(f"CPU Usage: {sys_info['cpu']['cpu_usage']}%")
+print(f"Memory: {sys_info['memory']['available_gb']:.1f}GB / {sys_info['memory']['total_gb']:.1f}GB available")
+
+# Execute command
+result = manager.execute_command("echo 'Hello from Python!'")
+if result['success']:
+    print(f"Command output: {result['stdout'].strip()}")
+
+# List top processes
+processes = manager.list_processes()
+print("\nTop 5 processes by CPU usage:")
+for proc in processes[:5]:
+    print(f"  PID {proc['pid']:6d}: {proc['name']:20s} CPU: {proc.get('cpu_percent', 0):5.1f}%")
+```
+
 #### Security Considerations
 - Use subprocess instead of os.system for security
 - Validate and sanitize command inputs
@@ -820,4 +1364,15 @@ This course demonstrates how Python concepts build upon each other:
 - Explore specialized libraries for your domain
 - Mentor other developers and share knowledge
 
-This comprehensive course provides the foundation for a successful career in Python development, from basic scripting to advanced AI research and development.
+This comprehensive course provides the foundation for a successful career in Python development, from basic scripting to advanced AI research and development. Each topic includes hands-on coding examples that you can execute in the integrated development environment, providing practical experience with real Python code execution and system operations.
+
+### Course Features
+- **Interactive Code Execution:** Run real Python code with full library support
+- **Virtual Environment:** Pre-configured with NumPy, Pandas, scikit-learn, TensorFlow, PyTorch
+- **CUDA Support:** GPU acceleration for machine learning and AI development
+- **File Management:** Create, edit, and manage Python files and projects
+- **Terminal Access:** Full command-line interface for system operations
+- **Package Management:** Install and manage Python packages
+- **Professional Tools:** Industry-standard development environment
+
+The course combines theoretical knowledge with practical implementation, ensuring you gain both understanding and hands-on experience with Python programming at all levels.
