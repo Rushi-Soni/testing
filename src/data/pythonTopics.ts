@@ -2059,12 +2059,12 @@ class BankAccount(ABC):
         return self._transaction_history.copy()
     
     # Protected method (internal use)
-    def _add_transaction(self, transaction_type: str, amount: float, description: str):
+    def _add_transaction(self, transaction_type: str, transaction_amount: float, description: str):
         """Add transaction to history"""
         transaction = {
             "timestamp": datetime.now().isoformat(),
             "type": transaction_type,
-            "amount": amount,
+            "amount": transaction_amount,
             "description": description,
             "balance_after": self._balance
         }
@@ -2082,16 +2082,16 @@ class BankAccount(ABC):
         pass
     
     # Concrete methods (shared implementation)
-    def deposit(self, amount: float) -> bool:
+    def deposit(self, deposit_amount: float) -> bool:
         """Deposit money into account"""
-        if amount <= 0:
+        if deposit_amount <= 0:
             raise ValueError("Deposit amount must be positive")
         
         if not self._is_active:
             raise RuntimeError("Cannot deposit to inactive account")
         
-        self._balance += amount
-        self._add_transaction("DEPOSIT", amount, f"Deposit of ${amount}.2f}")
+        self._balance += deposit_amount
+        self._add_transaction("DEPOSIT", deposit_amount, f"Deposit of ${deposit_amount:.2f}")
         return True
     
     def get_account_info(self) -> Dict[str, Any]:
@@ -2132,7 +2132,7 @@ class BankAccount(ABC):
     # Special methods (dunder methods)
     def __str__(self) -> str:
         """String representation for users"""
-        return f"{self.get_account_type().value.title()} Account {self._account_number} - {self._owner_name}: ${self._balance}.2f}"
+        return f"{self.get_account_type().value.title()} Account {self._account_number} - {self._owner_name}: ${self._balance:.2f}"
     
     def __repr__(self) -> str:
         """String representation for developers"""
@@ -2183,19 +2183,19 @@ class CheckingAccount(BankAccount):
         """Return account type"""
         return AccountType.CHECKING
     
-    def withdraw(self, amount: float) -> bool:
+    def withdraw(self, withdrawal_amount: float) -> bool:
         """Withdraw money with overdraft protection"""
-        if amount <= 0:
+        if withdrawal_amount <= 0:
             raise ValueError("Withdrawal amount must be positive")
         
         if not self._is_active:
             raise RuntimeError("Cannot withdraw from inactive account")
         
         # Check if withdrawal is possible with overdraft
-        if amount > self.available_balance:
-            raise ValueError(f"Insufficient funds. Available: ${self.available_balance}.2f}")
+        if withdrawal_amount > self.available_balance:
+            raise ValueError(f"Insufficient funds. Available: ${self.available_balance:.2f}")
         
-        self._balance -= amount
+        self._balance -= withdrawal_amount
         self._transaction_count += 1
         
         # Add overdraft fee if applicable
@@ -2204,7 +2204,7 @@ class CheckingAccount(BankAccount):
             self._balance -= overdraft_fee
             self._add_transaction("OVERDRAFT_FEE", -overdraft_fee, "Overdraft fee charged")
         
-        self._add_transaction("WITHDRAWAL", -amount, f"Withdrawal of ${amount}.2f}")
+        self._add_transaction("WITHDRAWAL", -withdrawal_amount, f"Withdrawal of ${withdrawal_amount:.2f}")
         return True
     
     def apply_monthly_fee(self) -> float:
@@ -2249,9 +2249,9 @@ class SavingsAccount(BankAccount):
         """Return account type"""
         return AccountType.SAVINGS
     
-    def withdraw(self, amount: float) -> bool:
+    def withdraw(self, withdrawal_amount: float) -> bool:
         """Withdraw money with restrictions"""
-        if amount <= 0:
+        if withdrawal_amount <= 0:
             raise ValueError("Withdrawal amount must be positive")
         
         if not self._is_active:
@@ -2262,12 +2262,12 @@ class SavingsAccount(BankAccount):
             raise ValueError("Monthly withdrawal limit exceeded")
         
         # Check minimum balance
-        if (self._balance - amount) < self._min_balance:
-            raise ValueError(f"Withdrawal would violate minimum balance of ${self._min_balance}.2f}")
+        if (self._balance - withdrawal_amount) < self._min_balance:
+            raise ValueError(f"Withdrawal would violate minimum balance of ${self._min_balance:.2f}")
         
-        self._balance -= amount
+        self._balance -= withdrawal_amount
         self._monthly_withdrawals += 1
-        self._add_transaction("WITHDRAWAL", -amount, f"Withdrawal of ${amount}.2f}")
+        self._add_transaction("WITHDRAWAL", -withdrawal_amount, f"Withdrawal of ${withdrawal_amount:.2f}")
         return True
     
     def reset_monthly_withdrawals(self):
@@ -2328,13 +2328,13 @@ accounts = [checking, savings]
 
 for account in accounts:
     interest = account.calculate_interest()
-    print(f"   {account.get_account_type().value.title()}: ${interest}.2f} annual interest")
+    print(f"   {account.get_account_type().value.title()}: ${interest:.2f} annual interest")
 
 # Demonstrate encapsulation and properties
 print("\\n3. Encapsulation and property access:")
-print(f"   Checking balance: ${checking.balance}.2f}")
-print(f"   Checking available: ${checking.available_balance}.2f}")
-print(f"   Savings minimum: ${savings.min_balance}.2f}")
+print(f"   Checking balance: ${checking.balance:.2f}")
+print(f"   Checking available: ${checking.available_balance:.2f}")
+print(f"   Savings minimum: ${savings.min_balance:.2f}")
 
 # Demonstrate method calls and state changes
 print("\\n4. Account operations:")
@@ -2342,8 +2342,8 @@ checking.deposit(500)
 checking.withdraw(200)
 savings.deposit(1000)
 
-print(f"   After operations - Checking: ${checking.balance}.2f}")
-print(f"   After operations - Savings: ${savings.balance}.2f}")
+print(f"   After operations - Checking: ${checking.balance:.2f}")
+print(f"   After operations - Savings: ${savings.balance:.2f}")
 
 # Demonstrate class methods and static methods
 print("\\n5. Class and static methods:")
@@ -2369,7 +2369,7 @@ print("\\n8. Transaction history (last 3 transactions):")
 for account in accounts:
     print(f"   {account.get_account_type().value.title()} Account:")
     for transaction in account.transaction_history[-3:]:
-        print(f"     {transaction['type']}: ${transaction['amount']}.2f} - {transaction['description']}")`,
+        print(f"     {transaction['type']}: ${transaction['amount']:.2f} - {transaction['description']}")`,
         explanation: [
           "Lines 10-14: Enum definition for account types, providing type-safe constants and better code organization.",
           "Lines 16-35: Abstract base class with class variables, protected attributes, and proper initialization including transaction logging.",
@@ -2565,11 +2565,11 @@ print(f"   Sample data (first 3 months):\\n{sales_data[:3]}")
 
 # Comprehensive statistics
 print(f"\\n   Statistical Summary:")
-print(f"   Overall mean: ${np.mean(sales_data)}.2f}")
-print(f"   Overall std: ${np.std(sales_data)}.2f}")
-print(f"   Overall median: ${np.median(sales_data)}.2f}")
-print(f"   Min value: ${np.min(sales_data)}.2f}")
-print(f"   Max value: ${np.max(sales_data)}.2f}")
+print(f"   Overall mean: ${np.mean(sales_data):.2f}")
+print(f"   Overall std: ${np.std(sales_data):.2f}")
+print(f"   Overall median: ${np.median(sales_data):.2f}")
+print(f"   Min value: ${np.min(sales_data):.2f}")
+print(f"   Max value: ${np.max(sales_data):.2f}")
 
 # Axis-specific operations
 monthly_totals = np.sum(sales_data, axis=1)  # Sum across regions
@@ -3201,7 +3201,7 @@ high_risk_customers = test_df[test_df['churn_probability'] > high_risk_threshold
 
 print(f"\\n   High-Risk Customer Analysis (probability > {high_risk_threshold}):")
 print(f"   Number of high-risk customers: {len(high_risk_customers)}")
-print(f"   Average monthly charges: ${high_risk_customers['monthly_charges'].mean()}.2f}")
+print(f"   Average monthly charges: ${high_risk_customers['monthly_charges'].mean():.2f}")
 print(f"   Average account length: {high_risk_customers['account_length_years'].mean():.2f} years")
 
 # Model performance summary
