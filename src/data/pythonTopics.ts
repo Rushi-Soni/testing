@@ -2204,7 +2204,7 @@ class CheckingAccount(BankAccount):
             self._balance -= overdraft_fee
             self._add_transaction("OVERDRAFT_FEE", -overdraft_fee, "Overdraft fee charged")
         
-        self._add_transaction("WITHDRAWAL", withdrawal_amount, f"Withdrawal of ${withdrawal_amount}.2f}")
+        self._add_transaction("WITHDRAWAL", withdrawal_amount, f"Withdrawal of ₹{withdrawal_amount:.2f}")
         return True
     
     def apply_monthly_fee(self) -> float:
@@ -2267,7 +2267,7 @@ class SavingsAccount(BankAccount):
         
         self._balance -= withdrawal_amount
         self._monthly_withdrawals += 1
-        self._add_transaction("WITHDRAWAL", withdrawal_amount, f"Withdrawal of ${withdrawal_amount}.2f}")
+        self._add_transaction("WITHDRAWAL", withdrawal_amount, f"Withdrawal of ₹{withdrawal_amount:.2f}")
         return True
     
     def reset_monthly_withdrawals(self):
