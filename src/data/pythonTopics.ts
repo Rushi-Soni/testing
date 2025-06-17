@@ -2091,7 +2091,7 @@ class BankAccount(ABC):
             raise RuntimeError("Cannot deposit to inactive account")
         
         self._balance += deposit_amount
-        self._add_transaction("DEPOSIT", deposit_amount, f"Deposit of ${deposit_amount:.2f}")
+        self._add_transaction("DEPOSIT", deposit_amount, f"Deposit of ${deposit_amount}.2f}")
         return True
     
     def get_account_info(self) -> Dict[str, Any]:
@@ -2132,7 +2132,7 @@ class BankAccount(ABC):
     # Special methods (dunder methods)
     def __str__(self) -> str:
         """String representation for users"""
-        return f"{self.get_account_type().value.title()} Account {self._account_number} - {self._owner_name}: ${self._balance:.2f}"
+        return f"{self.get_account_type().value.title()} Account {self._account_number} - {self._owner_name}: ${self._balance}.2f}"
     
     def __repr__(self) -> str:
         """String representation for developers"""
@@ -2193,7 +2193,7 @@ class CheckingAccount(BankAccount):
         
         # Check if withdrawal is possible with overdraft
         if withdrawal_amount > self.available_balance:
-            raise ValueError(f"Insufficient funds. Available: ${self.available_balance:.2f}")
+            raise ValueError(f"Insufficient funds. Available: ${self.available_balance}.2f}")
         
         self._balance -= withdrawal_amount
         self._transaction_count += 1
@@ -2204,7 +2204,7 @@ class CheckingAccount(BankAccount):
             self._balance -= overdraft_fee
             self._add_transaction("OVERDRAFT_FEE", -overdraft_fee, "Overdraft fee charged")
         
-        self._add_transaction("WITHDRAWAL", -withdrawal_amount, f"Withdrawal of ${withdrawal_amount:.2f}")
+        self._add_transaction("WITHDRAWAL", -withdrawal_amount, f"Withdrawal of ${withdrawal_amount}.2f}")
         return True
     
     def apply_monthly_fee(self) -> float:
@@ -2263,11 +2263,11 @@ class SavingsAccount(BankAccount):
         
         # Check minimum balance
         if (self._balance - withdrawal_amount) < self._min_balance:
-            raise ValueError(f"Withdrawal would violate minimum balance of ${self._min_balance:.2f}")
+            raise ValueError(f"Withdrawal would violate minimum balance of ${self._min_balance}.2f}")
         
         self._balance -= withdrawal_amount
         self._monthly_withdrawals += 1
-        self._add_transaction("WITHDRAWAL", -withdrawal_amount, f"Withdrawal of ${withdrawal_amount:.2f}")
+        self._add_transaction("WITHDRAWAL", -withdrawal_amount, f"Withdrawal of ${withdrawal_amount}.2f}")
         return True
     
     def reset_monthly_withdrawals(self):
@@ -2328,13 +2328,13 @@ accounts = [checking, savings]
 
 for account in accounts:
     interest = account.calculate_interest()
-    print(f"   {account.get_account_type().value.title()}: ${interest:.2f} annual interest")
+    print(f"   {account.get_account_type().value.title()}: ${interest}.2f} annual interest")
 
 # Demonstrate encapsulation and properties
 print("\\n3. Encapsulation and property access:")
-print(f"   Checking balance: ${checking.balance:.2f}")
-print(f"   Checking available: ${checking.available_balance:.2f}")
-print(f"   Savings minimum: ${savings.min_balance:.2f}")
+print(f"   Checking balance: ${checking.balance}.2f}")
+print(f"   Checking available: ${checking.available_balance}.2f}")
+print(f"   Savings minimum: ${savings.min_balance}.2f}")
 
 # Demonstrate method calls and state changes
 print("\\n4. Account operations:")
@@ -2342,8 +2342,8 @@ checking.deposit(500)
 checking.withdraw(200)
 savings.deposit(1000)
 
-print(f"   After operations - Checking: ${checking.balance:.2f}")
-print(f"   After operations - Savings: ${savings.balance:.2f}")
+print(f"   After operations - Checking: ${checking.balance}.2f}")
+print(f"   After operations - Savings: ${savings.balance}.2f}")
 
 # Demonstrate class methods and static methods
 print("\\n5. Class and static methods:")
