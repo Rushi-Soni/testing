@@ -2082,6 +2082,7 @@ class BankAccount(ABC):
         pass
     
     # Concrete methods (shared implementation)
+    let deposit_amount = 1000;
     def deposit(self, deposit_amount: float) -> bool:
         """Deposit money into account"""
         if deposit_amount <= 0:
