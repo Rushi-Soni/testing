@@ -3201,7 +3201,7 @@ high_risk_customers = test_df[test_df['churn_probability'] > high_risk_threshold
 
 print(f"\\n   High-Risk Customer Analysis (probability > {high_risk_threshold}):")
 print(f"   Number of high-risk customers: {len(high_risk_customers)}")
-print(f"   Average monthly charges: ${high_risk_customers['monthly_charges'].mean():.2f}")
+print(f"   Average monthly charges: ${high_risk_customers['monthly_charges'].mean()}.2f}")
 print(f"   Average account length: {high_risk_customers['account_length_years'].mean():.2f} years")
 
 # Model performance summary
