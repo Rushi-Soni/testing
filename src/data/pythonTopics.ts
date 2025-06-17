@@ -2333,7 +2333,7 @@ print(f"   {account.get_account_type().value.title()}: ₹{interest:.2f} annual 
 
 # Demonstrate encapsulation and properties
 print("\\n3. Encapsulation and property access:")
-print(f"   Checking balance: ${checking.balance}.2f}")
+print(f"   Checking balance: ₹{checking.balance:.2f}")
 print(f"   Checking available: ${checking.available_balance}.2f}")
 print(f"   Savings minimum: ${savings.min_balance}.2f}")
 
