@@ -2082,7 +2082,6 @@ class BankAccount(ABC):
         pass
     
     # Concrete methods (shared implementation)
-    let deposit_amount = 1000;
     def deposit(self, deposit_amount: float) -> bool:
         """Deposit money into account"""
         if deposit_amount <= 0:
@@ -2092,7 +2091,7 @@ class BankAccount(ABC):
             raise RuntimeError("Cannot deposit to inactive account")
         
         self._balance += deposit_amount
-        self._add_transaction("DEPOSIT", deposit_amount, f"Deposit of ${deposit_amount}.2f}")
+        self._add_transaction("DEPOSIT", deposit_amount, f"Deposit of ₹{deposit_amount}.2f}")
         return True
     
     def get_account_info(self) -> Dict[str, Any]:
