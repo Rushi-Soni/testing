@@ -2370,7 +2370,7 @@ print("\\n8. Transaction history (last 3 transactions):")
 for account in accounts:
     print(f"   {account.get_account_type().value.title()} Account:")
     for transaction in account.transaction_history[-3:]:
-        print(f"     {transaction['type']}: ${transaction['amount']}.2f} - {transaction['description']}")`,
+        print(f"     {transaction['type']}: ₹{transaction['amount']:.2f} - {transaction['description']}")`,
         explanation: [
           "Lines 10-14: Enum definition for account types, providing type-safe constants and better code organization.",
           "Lines 16-35: Abstract base class with class variables, protected attributes, and proper initialization including transaction logging.",
