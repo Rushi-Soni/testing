@@ -2343,8 +2343,8 @@ checking.deposit(500)
 checking.withdraw(200)
 savings.deposit(1000)
 
-print(f"   After operations - Checking: ${checking.balance:.2f}")
-print(f"   After operations - Savings: ${savings.balance:.2f}")
+print(f"   After operations - Checking: ₹{{checking.balance:.2f}}")
+print(f"   After operations - Savings: ₹{{savings.balance:.2f}}")
 
 # Demonstrate class methods and static methods
 print("\\n5. Class and static methods:")
