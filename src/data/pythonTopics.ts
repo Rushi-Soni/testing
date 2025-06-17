@@ -2565,11 +2565,11 @@ print(f"   Sample data (first 3 months):\\n{sales_data[:3]}")
 
 # Comprehensive statistics
 print(f"\\n   Statistical Summary:")
-print(f"   Overall mean: ${np.mean(sales_data):.2f}")
-print(f"   Overall std: ${np.std(sales_data):.2f}")
-print(f"   Overall median: ${np.median(sales_data):.2f}")
-print(f"   Min value: ${np.min(sales_data):.2f}")
-print(f"   Max value: ${np.max(sales_data):.2f}")
+print(f"   Overall mean: ${np.mean(sales_data)}.2f}")
+print(f"   Overall std: ${np.std(sales_data)}.2f}")
+print(f"   Overall median: ${np.median(sales_data)}.2f}")
+print(f"   Min value: ${np.min(sales_data)}.2f}")
+print(f"   Max value: ${np.max(sales_data)}.2f}")
 
 # Axis-specific operations
 monthly_totals = np.sum(sales_data, axis=1)  # Sum across regions
