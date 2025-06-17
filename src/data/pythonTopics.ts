@@ -2328,7 +2328,8 @@ accounts = [checking, savings]
 
 for account in accounts:
     interest = account.calculate_interest()
-    print(f"   {account.get_account_type().value.title()}: ${interest}.2f} annual interest")
+    interest = account.calculate_interest()
+print(f"   {account.get_account_type().value.title()}: ₹{interest:.2f} annual interest")
 
 # Demonstrate encapsulation and properties
 print("\\n3. Encapsulation and property access:")
