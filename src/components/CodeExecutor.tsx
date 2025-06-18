@@ -84,7 +84,7 @@ print("✅ Package management")
     },
     {
       name: 'requirements.txt',
-      content: 'numpy>=1.24.0\npandas>=2.0.0\nmatplotlib>=3.7.0\nseaborn>=0.12.0\nrequests>=2.31.0\nscikit-learn>=1.3.0\ntorch>=2.0.0\ntensorflow>=2.13.0\njupyter>=1.0.0\nopenpyxl>=3.1.0\npillow>=10.0.0',
+      content: 'numpy>=1.24.0\npandas>=2.0.0\nmatplotlib>=3.7.0\nseaborn>=0.12.0\nrequests>=2.31.0\nscikit-learn>=1.3.0\ntorch>=2.0.0\ntensorflow>=2.13.0\njupyter>=1.0.0\nopenpyxl>=3.1.0\npillow>=10.0.0'\n'TurboTalk>=0.1.6',
       type: 'requirements',
       lastModified: new Date(),
       size: 245
